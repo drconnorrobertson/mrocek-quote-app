@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mrocek & Co - Roofing Quote Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #1a1a1a;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #C0392B;
+        }
+
+        header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+
+        .header-contact {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .header-contact span {
+            margin: 0 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .form-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 1024px) {
+            .form-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .form-section h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #C0392B;
+            box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .three-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .three-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .radio-group,
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .radio-item,
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="radio"],
+        input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            accent-color: #C0392B;
+        }
+
+        .radio-item label,
+        .checkbox-item label {
+            margin-bottom: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .option-price {
+            font-size: 12px;
+            color: #666;
+            margin-left: 5px;
+        }
+
+        .quantity-input {
+            width: 60px;
+            padding: 6px;
+            margin-left: 10px;
+        }
+
+        /* Quote Summary Sidebar */
+        .quote-summary {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+
+        .quote-summary h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            padding: 8px 0;
+            color: #555;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .summary-item.total {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a1a;
+            border-bottom: 2px solid #C0392B;
+            padding: 12px 0;
+            margin-top: 10px;
+        }
+
+        .summary-value {
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .quote-number {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 15px;
+            font-family: monospace;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background-color: #C0392B;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background-color: #a02d23;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(192, 57, 43, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+            flex: 1;
+        }
+
+        .btn-secondary:hover {
+            background-color: #efefef;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 12px;
+            flex: none;
+        }
+
+        /* Info messages */
+        .info-box {
+            background-color: #f9f3f0;
+            border-left: 4px solid #C0392B;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 1000;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+            }
+
+            header {
+                margin: -20px -20px 20px -20px;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .form-wrapper {
+                display: block;
+            }
+
+            .form-section {
+                page-break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #eee;
+                margin-bottom: 20px;
+            }
+
+            .quote-summary {
+                position: static;
+                margin-top: 30px;
+                border: 2px solid #1a1a1a;
+                padding: 20px;
+            }
+
+            .button-group {
+                display: none;
+            }
+
+            .success-message {
+                display: none !important;
+            }
+
+            input[type="text"],
+            input[type="email"],
+            input[type="tel"],
+            input[type="number"],
+            select,
+            textarea {
+                border: 1px solid #999;
+            }
+
+            .terms-section {
+                margin-top: 30px;
+                font-size: 11px;
+                line-height: 1.4;
+            }
+
+            .signature-line {
+                margin-top: 40px;
+                border-top: 1px solid #000;
+                width: 40%;
+                padding-top: 10px;
+                font-size: 12px;
+            }
+        }
+
+        .terms-section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #555;
+            display: none;
+        }
+
+        .terms-section.show {
+            display: block;
+        }
+
+        .signature-line {
+            display: none;
+        }
+
+        .signature-line.show {
+            display: block;
+            margin-top: 40px;
+            border-top: 1px solid #000;
+            width: 40%;
+            padding-top: 10px;
+            font-size: 12px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 24px;
+            }
+
+            .form-section {
+                padding: 18px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            input[type="text"],
+            input[type="email"],
+            input[type="tel"],
+            input[type="number"],
+            select,
+            textarea {
+                font-size: 16px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .addon-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #fafafa;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .addon-label {
+            flex: 1;
+        }
+
+        .addon-price {
+            font-size: 13px;
+            color: #666;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>MROCEK & CO</h1>
+        <p>Roofing, Construction, Repairs, Installation</p>
+        <div class="header-contact">
+            <span>Phone: 724-496-9434</span>
+            <span>Pittsburgh, PA area</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="form-wrapper">
+            <form id="quoteForm">
+                <!-- CUSTOMER INFORMATION -->
+                <div class="form-section">
+                    <h2>Customer Information</h2>
+
+                    <div class="form-group">
+                        <label for="customerName">Customer Name *</label>
+                        <input type="text" id="customerName" name="customerName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Address *</label>
+                        <input type="text" id="address" name="address" required>
+                    </div>
+
+                    <div class="three-column">
+                        <div class="form-group">
+                            <label for="city">City *</label>
+                            <input type="text" id="city" name="city" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State *</label>
+                            <input type="text" id="state" name="state" value="PA" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="zip">ZIP *</label>
+                            <input type="text" id="zip" name="zip" required>
+                        </div>
+                    </div>
+
+                    <div class="two-column">
+                        <div class="form-group">
+                            <label for="phone">Phone *</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Insurance Claim?</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="insNo" name="hasInsurance" value="no" checked>
+                                <label for="insNo">No</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="insYes" name="hasInsurance" value="yes">
+                                <label for="insYes">Yes</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group hidden" id="insuranceCompanyGroup">
+                        <label for="insuranceCompany">Insurance Company</label>
+                        <input type="text" id="insuranceCompany" name="insuranceCompany">
+                    </div>
+                </div>
+
+                <!-- ROOF DETAILS -->
+                <div class="form-section">
+                    <h2>Roof Details</h2>
+
+                    <div class="two-column">
+                        <div class="form-group">
+                            <label for="roofSize">Roof Size (sq ft) *</label>
+                            <input type="number" id="roofSize" name="roofSize" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="roofSquares">Roofing Squares</label>
+                            <input type="number" id="roofSquares" name="roofSquares" readonly style="background-color: #f5f5f5;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stories">Number of Stories *</label>
+                        <select id="stories" name="stories" required>
+                            <option value="">Select...</option>
+                            <option value="1">1 Story</option>
+                            <option value="1.5">1.5 Stories</option>
+                            <option value="2">2 Stories</option>
+                            <option value="2.5">2.5 Stories</option>
+                            <option value="3">3 Stories</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="roofPitch">Roof Pitch *</label>
+                        <select id="roofPitch" name="roofPitch" required>
+                            <option value="">Select...</option>
+                            <option value="low">Low (3:12 - 5:12)</option>
+                            <option value="medium">Medium (6:12 - 9:12)</option>
+                            <option value="steep">Steep (10:12+)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="existingLayers">Number of Existing Layers *</label>
+                        <select id="existingLayers" name="existingLayers" required>
+                            <option value="">Select...</option>
+                            <option value="1">1 Layer</option>
+                            <option value="2">2 Layers</option>
+                            <option value="3">3+ Layers</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tear-Off Required?</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="tearoffNo" name="tearoff" value="no" checked>
+                                <label for="tearoffNo">No</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="tearoffYes" name="tearoff" value="yes">
+                                <label for="tearoffYes">Yes</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SERVICE TYPE -->
+                <div class="form-section">
+                    <h2>Service Type</h2>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="serviceReplacement" name="serviceType" value="replacement" checked>
+                            <label for="serviceReplacement">Full Roof Replacement</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="serviceRepair" name="serviceType" value="repair">
+                            <label for="serviceRepair">Roof Repair</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="serviceInstallation" name="serviceType" value="installation">
+                            <label for="serviceInstallation">New Installation</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="serviceGutters" name="serviceType" value="gutters">
+                            <label for="serviceGutters">Gutters & Downspouts</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="serviceSoffit" name="serviceType" value="soffit">
+                            <label for="serviceSoffit">Soffit & Fascia</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="serviceWaterproofing" name="serviceType" value="waterproofing">
+                            <label for="serviceWaterproofing">Waterproofing</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MATERIAL SELECTION -->
+                <div class="form-section" id="materialSection">
+                    <h2>Material Selection</h2>
+                    <div class="info-box">
+                        Prices shown are installed costs per square foot.
+                    </div>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="mat3tab" name="material" value="3tab" data-price="3.50">
+                            <label for="mat3tab">
+                                3-Tab Asphalt Shingles (Economy)
+                                <span class="option-price">$3.50/sq ft</span>
+                            </label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="matArch" name="material" value="arch" data-price="4.50" checked>
+                            <label for="matArch">
+                                Architectural Shingles (Standard)
+                                <span class="option-price">$4.50/sq ft</span>
+                            </label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="matPremium" name="material" value="premium" data-price="6.00">
+                            <label for="matPremium">
+                                Premium Architectural (Designer)
+                                <span class="option-price">$6.00/sq ft</span>
+                            </label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="matMetal" name="material" value="metal" data-price="9.00">
+                            <label for="matMetal">
+                                Metal Standing Seam
+                                <span class="option-price">$9.00/sq ft</span>
+                            </label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="matFlat" name="material" value="flat" data-price="7.00">
+                            <label for="matFlat">
+                                Flat/TPO (Commercial)
+                                <span class="option-price">$7.00/sq ft</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ADD-ONS -->
+                <div class="form-section">
+                    <h2>Add-Ons</h2>
+
+                    <div class="checkbox-group">
+                        <div class="addon-item">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="addon1" name="addons" value="iceShield" data-type="per-sqft" data-price="0.75">
+                                <label for="addon1" class="addon-label">Ice & Water Shield (full deck)</label>
+                            </div>
+                            <span class="addon-price">$0.75/sq ft</span>
+                        </div>
+
+                        <div class="addon-item">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="addon2" name="addons" value="underlayment" data-type="per-sqft" data-price="0.50">
+                                <label for="addon2" class="addon-label">Synthetic Underlayment</label>
+                            </div>
+                            <span class="addon-price">$0.50/sq ft</span>
+                        </div>
+
+                        <div class="addon-item">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="addon3" name="addons" value="ridgeVent" data-type="fixed" data-price="600">
+                                <label for="addon3" class="addon-label">Ridge Vent (40 lf typical)</label>
+                            </div>
+                            <span class="addon-price">$600 flat</span>
+                        </div>
+
+                        <div class="addon-item">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="addon4" name="addons" value="dripEdge" data-type="fixed" data-price="400">
+                                <label for="addon4" class="addon-label">Drip Edge (est. perimeter)</label>
+                            </div>
+                            <span class="addon-price">$400 flat</span>
+                        </div>
+
+                        <div class="addon-item">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="addon5" name="addons" value="newFlashing" data-type="fixed" data-price="500">
+                                <label for="addon5" class="addon-label">New Flashing</label>
+                            </div>
+                            <span class="addon-price">$500 flat</span>
+                        </div>
+
+                        <div class="addon-item">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="addon6" name="addons" value="chimneyFlashing" data-type="fixed" data-price="750">
+                                <label for="addon6" class="addon-label">Chimney Flashing</label>
+                            </div>
+                            <span class="addon-price">$750 flat</span>
+                        </div>
+
+                        <div class="addon-item">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="addon7" name="addons" value="skylightFlashing" data-type="quantity" data-price="400">
+                                <label for="addon7" class="addon-label">Skylight Flashing</label>
+                            </div>
+                            <input type="number" id="addon7Qty" class="quantity-input" min="0" value="0" placeholder="Qty">
+                            <span class="addon-price">$400 each</span>
+                        </div>
+
+                        <div class="addon-item">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="addon8" name="addons" value="pipeBoot" data-type="quantity" data-price="75">
+                                <label for="addon8" class="addon-label">Pipe Boot Replacement</label>
+                            </div>
+                            <input type="number" id="addon8Qty" class="quantity-input" min="0" value="0" placeholder="Qty">
+                            <span class="addon-price">$75 each</span>
+                        </div>
+
+                        <div class="addon-item">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="addon9" name="addons" value="gutterInstall" data-type="per-sqft" data-price="8.00">
+                                <label for="addon9" class="addon-label">Gutter Installation</label>
+                            </div>
+                            <span class="addon-price">$8/linear ft</span>
+                        </div>
+
+                        <div class="addon-item">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="addon10" name="addons" value="downspout" data-type="per-sqft" data-price="12.00">
+                                <label for="addon10" class="addon-label">Downspout Installation</label>
+                            </div>
+                            <span class="addon-price">$12/linear ft</span>
+                        </div>
+
+                        <div class="addon-item">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="addon11" name="addons" value="soffitRepair" data-type="per-sqft" data-price="12">
+                                <label for="addon11" class="addon-label">Soffit Repair</label>
+                            </div>
+                            <span class="addon-price">$12/sq ft</span>
+                        </div>
+
+                        <div class="addon-item">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="addon12" name="addons" value="fasciaReplace" data-type="per-sqft" data-price="10">
+                                <label for="addon12" class="addon-label">Fascia Replacement</label>
+                            </div>
+                            <span class="addon-price">$10/linear ft</span>
+                        </div>
+
+                        <div class="addon-item">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="addon13" name="addons" value="dumpster" data-type="fixed" data-price="500">
+                                <label for="addon13" class="addon-label">Dumpster/Debris Removal</label>
+                            </div>
+                            <span class="addon-price">$500 flat</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WARRANTY OPTIONS -->
+                <div class="form-section">
+                    <h2>Warranty Options</h2>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="warStandard" name="warranty" value="standard" data-price="0" checked>
+                            <label for="warStandard">
+                                Standard Manufacturer Warranty
+                                <span class="option-price">Included</span>
+                            </label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="war25" name="warranty" value="25year" data-price="500">
+                            <label for="war25">
+                                Extended 25-Year Workmanship Warranty
+                                <span class="option-price">+$500</span>
+                            </label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="war50" name="warranty" value="50year" data-price="1200">
+                            <label for="war50">
+                                Premium 50-Year Full Coverage
+                                <span class="option-price">+$1,200</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ADJUSTMENTS -->
+                <div class="form-section">
+                    <h2>Adjustments & Options</h2>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="permitFee" name="permitFee">
+                            Permit Fee (+$350)
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="discountAmount">Discount ($ or %)</label>
+                        <div class="two-column">
+                            <input type="number" id="discountAmount" name="discountAmount" min="0" step="0.01" placeholder="Amount">
+                            <select id="discountType" name="discountType">
+                                <option value="dollar">Dollar Amount</option>
+                                <option value="percent">Percentage</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        Steep pitch surcharge (15%) and multi-story surcharge (10%) are automatically calculated.
+                    </div>
+                </div>
+
+                <!-- NOTES -->
+                <div class="form-section">
+                    <h2>Special Notes</h2>
+                    <div class="form-group">
+                        <label for="notes">Additional Details, Damage Notes, etc.</label>
+                        <textarea id="notes" name="notes"></textarea>
+                    </div>
+                </div>
+
+                <!-- TERMS (shown on print) -->
+                <div class="form-section terms-section" id="termsSection">
+                    <h2>Terms & Conditions</h2>
+                    <p><strong>Quote Valid:</strong> 30 days from date of quote</p>
+                    <p><strong>Payment Terms:</strong> Payment due within 30 days of invoice date</p>
+                    <p><strong>Weather:</strong> Work subject to weather conditions. Schedule may be adjusted due to rain or extreme temperatures.</p>
+                    <p><strong>Site Conditions:</strong> Quote based on accessible site conditions. Additional costs may apply if unforeseen damage or structural issues are discovered during work.</p>
+                    <p><strong>Warranty:</strong> Workmanship warranted as selected above. Material warranties per manufacturer specifications.</p>
+                    <p style="margin-top: 15px; font-size: 11px; color: #666;">Thank you for choosing Mrocek & Co for your roofing needs.</p>
+                </div>
+
+                <div class="signature-line" id="signatureLine">
+                    Authorized Signature: _____________________________ Date: __________
+                </div>
+
+                <!-- BUTTONS -->
+                <div class="button-group">
+                    <button type="button" class="btn-secondary btn-small" id="clearBtn">Clear Form</button>
+                    <button type="button" class="btn-primary" id="pdfBtn">Generate PDF Quote</button>
+                </div>
+            </form>
+
+            <!-- QUOTE SUMMARY SIDEBAR -->
+            <div class="quote-summary">
+                <div class="quote-number">Quote #: <span id="quoteNumber">MRC-2026-0001</span></div>
+
+                <div class="summary-item">
+                    <span>Material Cost:</span>
+                    <span class="summary-value">$<span id="materialCost">0.00</span></span>
+                </div>
+
+                <div class="summary-item">
+                    <span>Tear-Off Cost:</span>
+                    <span class="summary-value">$<span id="tearoffCost">0.00</span></span>
+                </div>
+
+                <div class="summary-item">
+                    <span>Add-Ons:</span>
+                    <span class="summary-value">$<span id="addonsCost">0.00</span></span>
+                </div>
+
+                <div class="summary-item">
+                    <span>Subtotal:</span>
+                    <span class="summary-value">$<span id="subtotal">0.00</span></span>
+                </div>
+
+                <div class="summary-item">
+                    <span>Steep Pitch (15%):</span>
+                    <span class="summary-value">$<span id="steepSurcharge">0.00</span></span>
+                </div>
+
+                <div class="summary-item">
+                    <span>Multi-Story (10%):</span>
+                    <span class="summary-value">$<span id="storySurcharge">0.00</span></span>
+                </div>
+
+                <div class="summary-item">
+                    <span>Warranty Upgrade:</span>
+                    <span class="summary-value">$<span id="warrantyCost">0.00</span></span>
+                </div>
+
+                <div class="summary-item">
+                    <span>Permit Fee:</span>
+                    <span class="summary-value">$<span id="permitCost">0.00</span></span>
+                </div>
+
+                <div class="summary-item">
+                    <span>Discount:</span>
+                    <span class="summary-value">-$<span id="discountCost">0.00</span></span>
+                </div>
+
+                <div class="summary-item">
+                    <span>Sales Tax (7% materials):</span>
+                    <span class="summary-value">$<span id="tax">0.00</span></span>
+                </div>
+
+                <div class="summary-item total">
+                    <span>TOTAL QUOTE</span>
+                    <span class="summary-value">$<span id="totalQuote">0.00</span></span>
+                </div>
+
+                <div style="font-size: 12px; color: #999; margin-top: 15px; text-align: center;">
+                    Updated: <span id="lastUpdate">--:--</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="success-message" id="successMessage">Quote PDF generated successfully!</div>
+
+    <script>
+        // Initialize
+        const form = document.getElementById('quoteForm');
+        const quoteNumber = document.getElementById('quoteNumber');
+
+        // Generate quote number
+        function generateQuoteNumber() {
+            const year = new Date().getFullYear();
+            const random = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+            return `MRC-${year}-${random}`;
+        }
+
+        // Load from localStorage on page load
+        function loadFromStorage() {
+            const saved = localStorage.getItem('mrocekQuote');
+            if (saved) {
+                const data = JSON.parse(saved);
+                Object.keys(data).forEach(key => {
+                    const element = document.getElementById(key) || document.querySelector(`[name="${key}"]`);
+                    if (element) {
+                        if (element.type === 'radio' || element.type === 'checkbox') {
+                            if (element.type === 'radio') {
+                                document.querySelector(`[name="${key}"][value="${data[key]}"]`).checked = true;
+                            } else {
+                                element.checked = data[key];
+                            }
+                        } else {
+                            element.value = data[key];
+                        }
+                    }
+                });
+                quoteNumber.textContent = data.quoteNumber || generateQuoteNumber();
+            } else {
+                quoteNumber.textContent = generateQuoteNumber();
+            }
+        }
+
+        // Save to localStorage on change
+        function saveToStorage() {
+            const data = {
+                quoteNumber: quoteNumber.textContent
+            };
+
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                if (el.type === 'checkbox') {
+                    data[el.name] = el.checked;
+                } else if (el.type === 'radio') {
+                    if (el.checked) {
+                        data[el.name] = el.value;
+                    }
+                } else {
+                    data[el.id || el.name] = el.value;
+                }
+            });
+
+            localStorage.setItem('mrocekQuote', JSON.stringify(data));
+        }
+
+        // Toggle insurance company field
+        document.querySelectorAll('input[name="hasInsurance"]').forEach(el => {
+            el.addEventListener('change', function() {
+                document.getElementById('insuranceCompanyGroup').classList.toggle('hidden', this.value === 'no');
+            });
+        });
+
+        // Toggle material selection section
+        document.querySelectorAll('input[name="serviceType"]').forEach(el => {
+            el.addEventListener('change', function() {
+                const showMaterials = ['replacement', 'installation'].includes(this.value);
+                document.getElementById('materialSection').classList.toggle('hidden', !showMaterials);
+                if (!showMaterials) {
+                    document.querySelectorAll('input[name="material"]').forEach(m => m.checked = false);
+                }
+            });
+        });
+
+        // Update roofing squares
+        document.getElementById('roofSize').addEventListener('input', function() {
+            const squares = this.value ? (parseFloat(this.value) / 100).toFixed(2) : '0.00';
+            document.getElementById('roofSquares').value = squares;
+            calculateQuote();
+        });
+
+        // All form changes trigger calculation
+        form.addEventListener('change', function() {
+            calculateQuote();
+            saveToStorage();
+        });
+
+        form.addEventListener('input', function() {
+            calculateQuote();
+            saveToStorage();
+        });
+
+        // Calculate quote
+        function calculateQuote() {
+            // Get values
+            const roofSize = parseFloat(document.getElementById('roofSize').value) || 0;
+            const stories = parseFloat(document.getElementById('stories').value) || 1;
+            const roofPitch = document.getElementById('roofPitch').value;
+            const tearoff = document.querySelector('input[name="tearoff"]:checked')?.value === 'yes';
+            const existingLayers = parseInt(document.getElementById('existingLayers').value) || 1;
+            const serviceType = document.querySelector('input[name="serviceType"]:checked')?.value;
+            const material = document.querySelector('input[name="material"]:checked');
+            const materialPrice = material ? parseFloat(material.dataset.price) : 0;
+            const warranty = document.querySelector('input[name="warranty"]:checked');
+            const warrantyCost = warranty ? parseFloat(warranty.dataset.price) : 0;
+            const permitChecked = document.getElementById('permitFee').checked;
+            const discountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
+            const discountType = document.getElementById('discountType').value;
+
+            // Calculate material cost (main material)
+            let materialCost = roofSize * materialPrice;
+
+            // Calculate tear-off cost
+            let tearoffCost = 0;
+            if (tearoff && roofSize > 0) {
+                tearoffCost = roofSize * 1.50 * existingLayers;
+            }
+
+            // Calculate add-ons
+            let addonsCost = 0;
+            document.querySelectorAll('input[name="addons"]:checked').forEach(addon => {
+                const type = addon.dataset.type;
+                const price = parseFloat(addon.dataset.price);
+
+                if (type === 'per-sqft') {
+                    addonsCost += roofSize * price;
+                } else if (type === 'fixed') {
+                    addonsCost += price;
+                } else if (type === 'quantity') {
+                    const qtyId = addon.id + 'Qty';
+                    const qty = parseInt(document.getElementById(qtyId)?.value) || 0;
+                    addonsCost += qty * price;
+                }
+            });
+
+            // Subtotal
+            let subtotal = materialCost + tearoffCost + addonsCost;
+
+            // Steep pitch surcharge (15% of material + tearoff)
+            let steepSurcharge = 0;
+            if (roofPitch === 'steep') {
+                steepSurcharge = (materialCost + tearoffCost) * 0.15;
+                subtotal += steepSurcharge;
+            }
+
+            // Multi-story surcharge (10%)
+            let storySurcharge = 0;
+            if (stories >= 2) {
+                storySurcharge = (materialCost + tearoffCost) * 0.10;
+                subtotal += storySurcharge;
+            }
+
+            // Add warranty
+            subtotal += warrantyCost;
+
+            // Add permit
+            const permitCost = permitChecked ? 350 : 0;
+            subtotal += permitCost;
+
+            // Calculate discount
+            let discountCost = 0;
+            if (discountAmount > 0) {
+                if (discountType === 'percent') {
+                    discountCost = subtotal * (discountAmount / 100);
+                } else {
+                    discountCost = discountAmount;
+                }
+            }
+            subtotal -= discountCost;
+
+            // Tax (7% on materials only, estimate 40% of total is materials)
+            const materialsPercentage = subtotal * 0.40;
+            const tax = materialsPercentage * 0.07;
+            const total = subtotal + tax;
+
+            // Update display
+            document.getElementById('materialCost').textContent = materialCost.toFixed(2);
+            document.getElementById('tearoffCost').textContent = tearoffCost.toFixed(2);
+            document.getElementById('addonsCost').textContent = addonsCost.toFixed(2);
+            document.getElementById('subtotal').textContent = (materialCost + tearoffCost + addonsCost).toFixed(2);
+            document.getElementById('steepSurcharge').textContent = steepSurcharge.toFixed(2);
+            document.getElementById('storySurcharge').textContent = storySurcharge.toFixed(2);
+            document.getElementById('warrantyCost').textContent = warrantyCost.toFixed(2);
+            document.getElementById('permitCost').textContent = permitCost.toFixed(2);
+            document.getElementById('discountCost').textContent = discountCost.toFixed(2);
+            document.getElementById('tax').textContent = tax.toFixed(2);
+            document.getElementById('totalQuote').textContent = total.toFixed(2);
+
+            // Update last calculated time
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('lastUpdate').textContent = timeStr;
+        }
+
+        // Clear form
+        document.getElementById('clearBtn').addEventListener('click', function() {
+            if (confirm('Clear all form data?')) {
+                form.reset();
+                localStorage.removeItem('mrocekQuote');
+                quoteNumber.textContent = generateQuoteNumber();
+                document.getElementById('insuranceCompanyGroup').classList.add('hidden');
+                document.getElementById('materialSection').classList.remove('hidden');
+                calculateQuote();
+            }
+        });
+
+        // Generate PDF
+        document.getElementById('pdfBtn').addEventListener('click', function() {
+            // Show terms and signature on print
+            document.getElementById('termsSection').classList.add('show');
+            document.getElementById('signatureLine').classList.add('show');
+
+            // Trigger print dialog
+            setTimeout(() => {
+                window.print();
+                // Hide after print
+                document.getElementById('termsSection').classList.remove('show');
+                document.getElementById('signatureLine').classList.remove('show');
+            }, 100);
+
+            // Show success message
+            const msg = document.getElementById('successMessage');
+            msg.classList.add('show');
+            setTimeout(() => {
+                msg.classList.remove('show');
+            }, 3000);
+        });
+
+        // Initial load
+        loadFromStorage();
+        document.getElementById('insuranceCompanyGroup').classList.add('hidden');
+        calculateQuote();
+    </script>
+</body>
+</html>
