@@ -1046,12 +1046,23 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Redecking</label>
+                    <label>Full Redeck Required</label>
                     <div class="toggle-group">
-                        <button type="button" class="toggle-btn active" data-toggle="redecking" data-value="no">No</button>
-                        <button type="button" class="toggle-btn" data-toggle="redecking" data-value="yes">Yes</button>
+                        <button type="button" class="toggle-btn active" data-toggle="redecking" data-value="no">Off</button>
+                        <button type="button" class="toggle-btn" data-toggle="redecking" data-value="yes">On</button>
                     </div>
+                    <div style="font-size: 12px; color: #999; margin-top: 6px;">$75/sheet - 1 sheet per 32 sq ft</div>
                     <input type="hidden" id="redecking" value="no">
+                    <div id="redeckingDetails" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px;">
+                        <div class="calc-row" style="margin-bottom: 8px;">
+                            <label style="text-transform: capitalize; font-weight: 600;">Sheet Count</label>
+                            <div class="value" id="redeckingSheetCount" style="font-weight: 600;">0</div>
+                        </div>
+                        <div class="calc-row">
+                            <label style="text-transform: capitalize; font-weight: 600; color: #27ae60;">Redeck Cost</label>
+                            <div class="value" id="redeckingCostDisplay" style="font-weight: 600; color: #27ae60;">$0.00</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Chimney Flashing</label>
@@ -1077,28 +1088,38 @@
                 <!-- Gutters Details (hidden by default) -->
                 <div id="guttersDetails" style="display: none; border-top: 2px solid #f0f0f0; padding-top: 20px; margin-top: 20px;">
                     <div class="form-group">
-                        <label>Linear Feet</label>
+                        <label>Gutter Size</label>
+                        <div class="toggle-group">
+                            <button type="button" class="toggle-btn active" data-toggle="guttersSize" data-value="6">6 inch</button>
+                            <button type="button" class="toggle-btn" data-toggle="guttersSize" data-value="5">5 inch</button>
+                        </div>
+                        <input type="hidden" id="guttersSize" value="6">
+                    </div>
+                    <div class="form-group">
+                        <label>Linear Feet (LF)</label>
                         <input type="number" id="guttersLinearFeet" min="0" placeholder="0" value="0">
                     </div>
                     <div class="form-group">
-                        <label>Number of Downspouts</label>
-                        <input type="number" id="guttersDownspouts" min="0" placeholder="0" value="0">
+                        <label>Alu-rex Cover</label>
+                        <div class="toggle-group">
+                            <button type="button" class="toggle-btn active" data-toggle="guttersAlurex" data-value="no">No</button>
+                            <button type="button" class="toggle-btn" data-toggle="guttersAlurex" data-value="yes">Yes</button>
+                        </div>
+                        <div style="font-size: 12px; color: #999; margin-top: 6px;">Adds $10/LF</div>
+                        <input type="hidden" id="guttersAlurex" value="no">
                     </div>
                     <div class="form-group">
-                        <label>Stories</label>
+                        <label>2-Story</label>
                         <div class="toggle-group">
-                            <button type="button" class="toggle-btn active" data-toggle="guttersStories" data-value="1">1</button>
-                            <button type="button" class="toggle-btn" data-toggle="guttersStories" data-value="2">2</button>
+                            <button type="button" class="toggle-btn active" data-toggle="guttersStories" data-value="no">No</button>
+                            <button type="button" class="toggle-btn" data-toggle="guttersStories" data-value="yes">Yes</button>
                         </div>
-                        <input type="hidden" id="guttersStories" value="1">
+                        <div style="font-size: 12px; color: #999; margin-top: 6px;">Adds 40% to total cost</div>
+                        <input type="hidden" id="guttersStories" value="no">
                     </div>
                     <div class="form-group">
-                        <label>Size</label>
-                        <div class="toggle-group">
-                            <button type="button" class="toggle-btn active" data-toggle="guttersSize" data-value="5">5 inch</button>
-                            <button type="button" class="toggle-btn" data-toggle="guttersSize" data-value="6">6 inch</button>
-                        </div>
-                        <input type="hidden" id="guttersSize" value="5">
+                        <label>Gutter Contract Price (Optional Override)</label>
+                        <input type="number" id="gutterContractPrice" min="0" placeholder="Leave blank to auto-calculate" step="0.01">
                     </div>
                 </div>
             </div>
@@ -1173,38 +1194,100 @@
 
         <!-- Sidebar Calculations -->
         <div class="sidebar">
-            <h3>Internal Breakdown</h3>
+            <h3>Pricing Breakdown</h3>
 
-            <div class="calc-row">
-                <label>Sub Cost (at pitch)</label>
-                <div class="value" id="subCost">$0.00</div>
-            </div>
-            <div class="calc-row">
-                <label>Material Cost</label>
-                <div class="value" id="materialCost">$0.00</div>
-            </div>
-            <div class="calc-row">
-                <label>Dump Cost</label>
-                <div class="value" id="dumpCostDisplay">$0.00</div>
-            </div>
-            <div class="calc-row">
-                <label>Accessories</label>
-                <div class="value" id="accessoriesCostDisplay">$0.00</div>
-            </div>
-            <div class="calc-row">
-                <label>Add-ons Total</label>
-                <div class="value" id="addonsCost">$0.00</div>
-            </div>
-            <div class="calc-row">
-                <label>Gutters Total</label>
-                <div class="value" id="guttersCost">$0.00</div>
-            </div>
-            <div class="calc-row total">
-                <label>COST TO MROCEK</label>
-                <div class="value" id="totalCost">$0.00</div>
+            <!-- ROOF SECTION -->
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: #555; margin-bottom: 10px;">Roof Section</div>
+
+                <div class="calc-row">
+                    <label>Install Revenue</label>
+                    <div class="value" id="installRevenue">$0.00</div>
+                </div>
+                <div class="calc-row">
+                    <label>Material Cost</label>
+                    <div class="value" id="materialCost">$0.00</div>
+                </div>
+                <div class="calc-row">
+                    <label>Dump</label>
+                    <div class="value" id="dumpCostDisplay">$0.00</div>
+                </div>
+                <div class="calc-row">
+                    <label>Accessories</label>
+                    <div class="value" id="accessoriesCostDisplay">$0.00</div>
+                </div>
+
+                <div class="calc-row" style="border-top: 1px solid #ddd; padding-top: 8px; margin-top: 8px; font-weight: 600;">
+                    <label>Roof Subtotal</label>
+                    <div class="value" id="roofSubtotal">$0.00</div>
+                </div>
+
+                <div class="calc-row" style="font-size: 12px; margin-top: 8px;">
+                    <label style="color: #999;">Sub Cost (Internal)</label>
+                    <div class="value" id="subCost" style="color: #999;">$0.00</div>
+                </div>
+
+                <div class="calc-row total" style="margin-top: 8px;">
+                    <label>Roof Gross Profit</label>
+                    <div class="value" id="roofGrossProfit">$0.00</div>
+                </div>
             </div>
 
-            <div class="calc-row" style="margin-top: 8px;">
+            <!-- ADD-ONS -->
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: #555; margin-bottom: 10px;">Add-ons</div>
+                <div class="calc-row" id="redeckLineItem" style="display: none;">
+                    <label id="redeckLineLabel">Redeck</label>
+                    <div class="value" id="redeckLineValue">$0.00</div>
+                </div>
+                <div class="calc-row" id="skylightsLineItem" style="display: none;">
+                    <label id="skylightsLineLabel">Skylights</label>
+                    <div class="value" id="skylightsLineValue">$0.00</div>
+                </div>
+            </div>
+
+            <!-- GUTTERS -->
+            <div id="guttersBreakdownSection" style="margin-bottom: 20px; display: none;">
+                <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; color: #555; margin-bottom: 10px;">Gutters</div>
+                <div class="calc-row">
+                    <label>Gutter Price</label>
+                    <div class="value" id="gutterPriceDisplay">$0.00</div>
+                </div>
+                <div class="calc-row" style="font-size: 12px;">
+                    <label style="color: #999;">Sub Cost (Internal)</label>
+                    <div class="value" id="gutterSubCostDisplay" style="color: #999;">$0.00</div>
+                </div>
+                <div class="calc-row total">
+                    <label>Gutter Gross Profit</label>
+                    <div class="value" id="gutterGrossProfitDisplay">$0.00</div>
+                </div>
+            </div>
+
+            <!-- COMBINED TOTALS -->
+            <div style="padding-top: 15px; border-top: 2px solid #C0392B;">
+                <div class="calc-row total" style="margin-top: 12px; margin-bottom: 12px;">
+                    <label>Combined Total</label>
+                    <div class="value" id="combinedTotal">$0.00</div>
+                </div>
+
+                <div class="calc-row total" style="margin-bottom: 12px;">
+                    <label>Combined Gross Profit</label>
+                    <div class="value" id="combinedGrossProfit">$0.00</div>
+                </div>
+
+                <div id="duddySplitBreakdown" style="display: none; background: #f9f9f9; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
+                    <div class="calc-row" style="margin-bottom: 8px;">
+                        <label style="font-size: 12px;">Derek's Share (40%)</label>
+                        <div class="value" id="dereksShare" style="font-size: 13px;">$0.00</div>
+                    </div>
+                    <div class="calc-row">
+                        <label style="font-size: 12px;">Duddy's Share (60%)</label>
+                        <div class="value" id="duddysShare" style="font-size: 13px;">$0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="calc-row" style="margin-top: 12px;">
                 <label>Crew</label>
                 <div class="value" id="crewDisplay">Greg</div>
             </div>
@@ -1215,9 +1298,9 @@
             </div>
 
             <div class="margin-section">
-                <h4>Margin Settings</h4>
+                <h4>Margin (Informational)</h4>
                 <div class="margin-display">
-                    <span class="label">Margin Percentage</span>
+                    <span class="label">Calculated Margin</span>
                     <span class="percentage" id="marginPercentage">35%</span>
                 </div>
                 <div class="margin-slider-container">
@@ -1344,14 +1427,13 @@
         document.getElementById('pitch').addEventListener('change', calculateAll);
         document.getElementById('skylights').addEventListener('input', calculateAll);
         document.getElementById('guttersLinearFeet').addEventListener('input', calculateAll);
-        document.getElementById('guttersDownspouts').addEventListener('input', calculateAll);
+        document.getElementById('gutterContractPrice').addEventListener('input', calculateAll);
         document.getElementById('jobNotes').addEventListener('input', autoSave);
         document.getElementById('proposedStartDate').addEventListener('change', autoSave);
         document.getElementById('clientName').addEventListener('input', autoSave);
         document.getElementById('clientPhone').addEventListener('input', autoSave);
         document.getElementById('clientAddress').addEventListener('input', autoSave);
         document.getElementById('marginSlider').addEventListener('input', function() {
-            document.getElementById('marginPercentage').textContent = this.value + '%';
             calculateAll();
         });
 
@@ -1374,6 +1456,9 @@
             btn.addEventListener('click', calculateAll);
         });
         document.querySelectorAll('[data-toggle="guttersSize"]').forEach(btn => {
+            btn.addEventListener('click', calculateAll);
+        });
+        document.querySelectorAll('[data-toggle="guttersAlurex"]').forEach(btn => {
             btn.addEventListener('click', calculateAll);
         });
 
@@ -1423,10 +1508,6 @@
             const chimney = chimneyToggle === 'yes' ? 1 : 0;
             const guttersToggle = document.getElementById('gutters').value;
             const gutters = guttersToggle === 'yes' ? 1 : 0;
-            const guttersLinearFeet = gutters ? (parseFloat(document.getElementById('guttersLinearFeet').value) || 0) : 0;
-            const guttersDownspouts = gutters ? (parseInt(document.getElementById('guttersDownspouts').value) || 0) : 0;
-            const guttersStories = gutters ? parseInt(document.getElementById('guttersStories').value) : 1;
-            const guttersSize = gutters ? parseInt(document.getElementById('guttersSize').value) : 5;
             const marginPercent = parseInt(document.getElementById('marginSlider').value) || 35;
             const dumpCost = parseFloat(document.getElementById('dumpCost').value) || 500;
             const rubberAccessories = parseFloat(document.getElementById('rubberAccessories').value) || 0;
@@ -1438,6 +1519,7 @@
             const overridePrice = parseFloat(document.getElementById('materialCostOverride').value);
             const materialPrice = overridePrice || presetPrice;
 
+            // ROOF SECTION CALCULATIONS
             // Sub cost per square
             const subCostPerSquare = getSubCost(pitchValue, crew);
             const subCost = subCostPerSquare * squares;
@@ -1445,59 +1527,161 @@
             // Material cost
             const materialCostValue = materialPrice * squares;
 
-            // Add-ons
-            const redeckingCost = redecking ? (75 * squares) : 0;
-            const chimneyCost = chimney ? 450 : 0;
-            const skylightsCost = skylights * 400;
-            const addonsCost = redeckingCost + chimneyCost + skylightsCost;
+            // Install Revenue (fixed customer rates by pitch)
+            const customerRate = pitch.customerRate;
+            const installRevenue = customerRate * squares;
 
-            // Gutters
-            let guttersCost = 0;
-            if (gutters) {
-                let gutterPricePerFt = 0;
-                if (guttersSize === 5) {
-                    gutterPricePerFt = guttersStories === 1 ? 8 : 10;
-                } else if (guttersSize === 6) {
-                    gutterPricePerFt = guttersStories === 1 ? 10 : 13;
-                }
-                const downspoutPrice = guttersStories === 1 ? 75 : 100;
-                const gutterLineCost = guttersLinearFeet * gutterPricePerFt;
-                const downspoutsCost = guttersDownspouts * downspoutPrice;
-                guttersCost = gutterLineCost + downspoutsCost;
+            // Roof Subtotal (customer-facing)
+            const roofSubtotal = installRevenue + materialCostValue + dumpCost + rubberAccessories;
+
+            // Roof Gross Profit (before add-ons and gutters)
+            const roofGrossProfit = roofSubtotal - (subCost + materialCostValue + dumpCost + rubberAccessories);
+
+            // REDECK CALCULATION
+            let redeckingCost = 0;
+            let redeckingSheetCount = 0;
+            if (redecking) {
+                redeckingSheetCount = Math.ceil(squares * 100 / 32);
+                redeckingCost = redeckingSheetCount * 75;
             }
 
-            // Total cost to Mrocek (internal, not customer-facing)
-            const totalCostToMrocek = subCost + materialCostValue + dumpCost + rubberAccessories + addonsCost + guttersCost;
+            // SKYLIGHTS CALCULATION (changed from $400 to $350)
+            const skylightsCost = skylights * 350;
 
-            // Customer-facing price calculation
-            // Customer price = cost / (1 - margin%)
-            const marginDecimal = marginPercent / 100;
-            const quotePrice = totalCostToMrocek / (1 - marginDecimal);
+            // GUTTERS CALCULATION
+            let guttersLinearFeet = gutters ? (parseFloat(document.getElementById('guttersLinearFeet').value) || 0) : 0;
+            let guttersSize = gutters ? parseInt(document.getElementById('guttersSize').value) : 6;
+            let guttersAlurex = gutters ? (document.getElementById('guttersAlurex').value === 'yes') : false;
+            let guttersTwoStory = gutters ? (document.getElementById('guttersStories').value === 'yes') : false;
+            let gutterContractPriceOverride = gutters ? (parseFloat(document.getElementById('gutterContractPrice').value) || 0) : 0;
 
-            // Margin amounts
-            const marginAmount = quotePrice - totalCostToMrocek;
+            let gutterCustomerPrice = 0;
+            let gutterSubCost = 0;
 
-            const pricePerSquare = squares > 0 ? quotePrice / squares : 0;
+            if (gutters && guttersLinearFeet > 0) {
+                // Gutter customer rate lookup
+                const gutterRateKey = guttersSize + '_' + (guttersAlurex ? 'alurex' : 'no');
+                const gutterRates = {
+                    '5_no': 28,
+                    '5_alurex': 38,
+                    '6_no': 35,
+                    '6_alurex': 47
+                };
 
-            // Update display
-            updateValue('subCost', subCost);
+                let baseRate = gutterRates[gutterRateKey] || 35;
+                if (guttersTwoStory) {
+                    baseRate = baseRate * 1.4;
+                }
+
+                gutterCustomerPrice = gutterContractPriceOverride > 0 ? gutterContractPriceOverride : (guttersLinearFeet * baseRate);
+
+                // Gutter sub cost calculation
+                const gutterSubRates = {
+                    '5_no': 18,
+                    '5_alurex': 25,
+                    '6_no': 23,
+                    '6_alurex': 30
+                };
+
+                let baseSubRate = gutterSubRates[gutterRateKey] || 23;
+                if (guttersTwoStory) {
+                    baseSubRate = baseSubRate * 1.35;
+                }
+
+                gutterSubCost = guttersLinearFeet * baseSubRate;
+            }
+
+            const gutterGrossProfit = gutterCustomerPrice - gutterSubCost;
+
+            // COMBINED TOTALS
+            const combinedTotal = roofSubtotal + redeckingCost + skylightsCost + gutterCustomerPrice;
+            const totalInternalCost = subCost + materialCostValue + dumpCost + rubberAccessories + gutterSubCost;
+            const combinedGrossProfit = roofGrossProfit + redeckingCost + skylightsCost + gutterGrossProfit;
+
+            // Duddy split
+            let dereksShare = 0;
+            let duddysShare = 0;
+            if (duddySplit) {
+                dereksShare = combinedGrossProfit * 0.4;
+                duddysShare = combinedGrossProfit * 0.6;
+            }
+
+            // Update display - ROOF SECTION
+            updateValue('installRevenue', installRevenue);
             updateValue('materialCost', materialCostValue);
             updateValue('dumpCostDisplay', dumpCost);
             updateValue('accessoriesCostDisplay', rubberAccessories);
-            updateValue('addonsCost', addonsCost);
-            updateValue('guttersCost', guttersCost);
-            updateValue('totalCost', totalCostToMrocek);
-            updateValue('marginAmount', marginAmount);
-            updateValue('quotePrice', quotePrice);
-            updateValue('pricePerSquare', pricePerSquare);
+            updateValue('roofSubtotal', roofSubtotal);
+            updateValue('subCost', subCost);
+            updateValue('roofGrossProfit', roofGrossProfit);
+
+            // Update display - ADD-ONS
+            const redeckLineItem = document.getElementById('redeckLineItem');
+            const skylightsLineItem = document.getElementById('skylightsLineItem');
+
+            if (redecking) {
+                redeckLineItem.style.display = 'flex';
+                document.getElementById('redeckLineLabel').textContent = `Redeck (${redeckingSheetCount} sheets)`;
+                document.getElementById('redeckLineValue').textContent = formatCurrency(redeckingCost);
+                document.getElementById('redeckingSheetCount').textContent = redeckingSheetCount;
+                updateValue('redeckingCostDisplay', redeckingCost);
+            } else {
+                redeckLineItem.style.display = 'none';
+            }
+
+            if (skylights > 0) {
+                skylightsLineItem.style.display = 'flex';
+                document.getElementById('skylightsLineLabel').textContent = `Skylights (${skylights})`;
+                document.getElementById('skylightsLineValue').textContent = formatCurrency(skylightsCost);
+            } else {
+                skylightsLineItem.style.display = 'none';
+            }
+
+            // Update display - GUTTERS
+            const guttersBreakdownSection = document.getElementById('guttersBreakdownSection');
+            const redeckingDetails = document.getElementById('redeckingDetails');
+
+            if (gutters && guttersLinearFeet > 0) {
+                guttersBreakdownSection.style.display = 'block';
+                updateValue('gutterPriceDisplay', gutterCustomerPrice);
+                updateValue('gutterSubCostDisplay', gutterSubCost);
+                updateValue('gutterGrossProfitDisplay', gutterGrossProfit);
+            } else {
+                guttersBreakdownSection.style.display = 'none';
+            }
+
+            if (redecking) {
+                redeckingDetails.style.display = 'block';
+            } else {
+                redeckingDetails.style.display = 'none';
+            }
+
+            // Update display - COMBINED
+            updateValue('combinedTotal', combinedTotal);
+            updateValue('combinedGrossProfit', combinedGrossProfit);
+
+            if (duddySplit) {
+                document.getElementById('duddySplitBreakdown').style.display = 'block';
+                updateValue('dereksShare', dereksShare);
+                updateValue('duddysShare', duddysShare);
+            } else {
+                document.getElementById('duddySplitBreakdown').style.display = 'none';
+            }
 
             // Update crew and duddy split display
             document.getElementById('crewDisplay').textContent = crew.charAt(0).toUpperCase() + crew.slice(1);
             document.getElementById('duddySplitDisplay').textContent = duddySplit ? 'On (60% Duddy / 40% Derek)' : 'Off';
 
+            // Calculate margin percentage (informational)
+            const calculatedMargin = combinedTotal > 0 ? ((combinedTotal - totalInternalCost) / combinedTotal) * 100 : 0;
+            document.getElementById('marginPercentage').textContent = Math.round(calculatedMargin) + '%';
+            updateValue('marginAmount', combinedTotal - totalInternalCost);
+
             // Calculate monthly payment
-            const monthlyPayment = calculateMonthlyPayment(quotePrice);
+            const monthlyPayment = calculateMonthlyPayment(combinedTotal);
             document.getElementById('monthlyPayment').textContent = formatCurrency(monthlyPayment) + '/mo';
+
+            const pricePerSquare = squares > 0 ? combinedTotal / squares : 0;
 
             // Store for PDF
             window.quoteData = {
@@ -1506,27 +1690,36 @@
                 pitch,
                 skylights,
                 redecking,
+                redeckingSheetCount,
+                redeckingCost,
                 chimney,
                 gutters,
                 guttersLinearFeet,
-                guttersDownspouts,
-                guttersStories,
                 guttersSize,
-                guttersCost,
+                guttersAlurex,
+                guttersTwoStory,
+                gutterCustomerPrice,
+                gutterSubCost,
+                gutterGrossProfit,
                 crew,
                 duddySplit,
+                dereksShare,
+                duddysShare,
                 materialPrice,
                 materialCostValue,
                 dumpCost,
                 rubberAccessories,
-                addonsCost,
+                installRevenue,
+                roofSubtotal,
+                roofGrossProfit,
                 subCost,
-                totalCostToMrocek,
-                marginPercent,
-                marginAmount,
-                quotePrice,
-                pricePerSquare,
-                monthlyPayment
+                skylightsCost,
+                totalInternalCost,
+                combinedTotal,
+                combinedGrossProfit,
+                calculatedMargin,
+                monthlyPayment,
+                pricePerSquare
             };
 
             autoSave();
@@ -1556,12 +1749,12 @@
             document.getElementById('chimney').value = 'no';
             document.getElementById('gutters').value = 'no';
             document.getElementById('guttersLinearFeet').value = '0';
-            document.getElementById('guttersDownspouts').value = '0';
-            document.getElementById('guttersStories').value = '1';
-            document.getElementById('guttersSize').value = '5';
+            document.getElementById('guttersSize').value = '6';
+            document.getElementById('guttersAlurex').value = 'no';
+            document.getElementById('guttersStories').value = 'no';
+            document.getElementById('gutterContractPrice').value = '';
             document.getElementById('guttersDetails').style.display = 'none';
             document.getElementById('marginSlider').value = '35';
-            document.getElementById('marginPercentage').textContent = '35%';
             document.getElementById('jobNotes').value = '';
             document.getElementById('photoGallery').innerHTML = '';
             document.getElementById('crew').value = 'greg';
@@ -1576,11 +1769,15 @@
             document.querySelectorAll('[data-toggle="gutters"]').forEach(b => b.classList.remove('active'));
             document.querySelector('[data-toggle="gutters"][data-value="no"]').classList.add('active');
             document.querySelectorAll('[data-toggle="guttersStories"]').forEach(b => b.classList.remove('active'));
-            document.querySelector('[data-toggle="guttersStories"][data-value="1"]').classList.add('active');
+            document.querySelector('[data-toggle="guttersStories"][data-value="no"]').classList.add('active');
             document.querySelectorAll('[data-toggle="guttersSize"]').forEach(b => b.classList.remove('active'));
-            document.querySelector('[data-toggle="guttersSize"][data-value="5"]').classList.add('active');
+            document.querySelector('[data-toggle="guttersSize"][data-value="6"]').classList.add('active');
+            document.querySelectorAll('[data-toggle="guttersAlurex"]').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-toggle="guttersAlurex"][data-value="no"]').classList.add('active');
             document.querySelectorAll('[data-toggle="duddySplit"]').forEach(b => b.classList.remove('active'));
             document.querySelector('[data-toggle="duddySplit"][data-value="no"]').classList.add('active');
+            document.querySelectorAll('[data-toggle="redecking"]').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-toggle="redecking"][data-value="no"]').classList.add('active');
 
             document.getElementById('product').value = 'oc-trudef';
             calculateAll();
@@ -1660,9 +1857,10 @@
                 chimney: document.getElementById('chimney').value,
                 gutters: document.getElementById('gutters').value,
                 guttersLinearFeet: document.getElementById('guttersLinearFeet').value,
-                guttersDownspouts: document.getElementById('guttersDownspouts').value,
-                guttersStories: document.getElementById('guttersStories').value,
                 guttersSize: document.getElementById('guttersSize').value,
+                guttersAlurex: document.getElementById('guttersAlurex').value,
+                guttersStories: document.getElementById('guttersStories').value,
+                gutterContractPrice: document.getElementById('gutterContractPrice').value,
                 product: document.getElementById('product').value,
                 crew: document.getElementById('crew').value,
                 materialCostOverride: document.getElementById('materialCostOverride').value,
@@ -1698,9 +1896,10 @@
                 chimney: document.getElementById('chimney').value,
                 gutters: document.getElementById('gutters').value,
                 guttersLinearFeet: document.getElementById('guttersLinearFeet').value,
-                guttersDownspouts: document.getElementById('guttersDownspouts').value,
-                guttersStories: document.getElementById('guttersStories').value,
                 guttersSize: document.getElementById('guttersSize').value,
+                guttersAlurex: document.getElementById('guttersAlurex').value,
+                guttersStories: document.getElementById('guttersStories').value,
+                gutterContractPrice: document.getElementById('gutterContractPrice').value,
                 product: document.getElementById('product').value,
                 crew: document.getElementById('crew').value,
                 materialCostOverride: document.getElementById('materialCostOverride').value,
@@ -1740,10 +1939,11 @@
             document.getElementById('redecking').value = quote.redecking;
             document.getElementById('chimney').value = quote.chimney;
             document.getElementById('gutters').value = quote.gutters;
-            document.getElementById('guttersLinearFeet').value = quote.guttersLinearFeet;
-            document.getElementById('guttersDownspouts').value = quote.guttersDownspouts;
-            document.getElementById('guttersStories').value = quote.guttersStories;
-            document.getElementById('guttersSize').value = quote.guttersSize;
+            document.getElementById('guttersLinearFeet').value = quote.guttersLinearFeet || '0';
+            document.getElementById('guttersSize').value = quote.guttersSize || '6';
+            document.getElementById('guttersAlurex').value = quote.guttersAlurex || 'no';
+            document.getElementById('guttersStories').value = quote.guttersStories || 'no';
+            document.getElementById('gutterContractPrice').value = quote.gutterContractPrice || '';
             document.getElementById('product').value = quote.product;
             document.getElementById('crew').value = quote.crew || 'greg';
             document.getElementById('materialCostOverride').value = quote.materialCostOverride || '';
@@ -1751,7 +1951,6 @@
             document.getElementById('rubberAccessories').value = quote.rubberAccessories || '0';
             document.getElementById('duddySplit').value = quote.duddySplit || 'no';
             document.getElementById('marginSlider').value = quote.marginSlider;
-            document.getElementById('marginPercentage').textContent = quote.marginSlider + '%';
             document.getElementById('jobNotes').value = quote.jobNotes;
             window.photos = quote.photos || [];
 
@@ -1768,10 +1967,13 @@
             });
 
             document.querySelectorAll('[data-toggle="guttersStories"]').forEach(b => b.classList.remove('active'));
-            document.querySelector(`[data-toggle="guttersStories"][data-value="${quote.guttersStories}"]`).classList.add('active');
+            document.querySelector(`[data-toggle="guttersStories"][data-value="${quote.guttersStories || 'no'}"]`).classList.add('active');
 
             document.querySelectorAll('[data-toggle="guttersSize"]').forEach(b => b.classList.remove('active'));
-            document.querySelector(`[data-toggle="guttersSize"][data-value="${quote.guttersSize}"]`).classList.add('active');
+            document.querySelector(`[data-toggle="guttersSize"][data-value="${quote.guttersSize || '6'}"]`).classList.add('active');
+
+            document.querySelectorAll('[data-toggle="guttersAlurex"]').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-toggle="guttersAlurex"][data-value="${quote.guttersAlurex || 'no'}"]`).classList.add('active');
 
             document.querySelectorAll('[data-toggle="duddySplit"]').forEach(b => b.classList.remove('active'));
             document.querySelector(`[data-toggle="duddySplit"][data-value="${quote.duddySplit || 'no'}"]`).classList.add('active');
@@ -2013,19 +2215,14 @@
             doc.setFont(undefined, 'normal');
             doc.setFontSize(8.5);
 
-            // Calculate customer labor rate based on pitch
-            const customerLaborRate = data.pitch.customerRate;
-            const customerLaborCost = customerLaborRate * data.squares;
-
             const items = [
-                ['Roofing Material', formatCurrency(data.materialCostValue)],
-                ['Labor & Installation', formatCurrency(customerLaborCost)],
-                ['Dump & Cleanup', formatCurrency(data.dumpCost)],
-                ['Accessories', formatCurrency(data.rubberAccessories)]
+                ['Roofing', formatCurrency(data.roofSubtotal)],
+                ['Dump & Cleanup', formatCurrency(data.dumpCost)]
             ];
 
-            if (data.addonsCost > 0) items.push(['Add-ons', formatCurrency(data.addonsCost)]);
-            if (data.guttersCost > 0) items.push(['Gutters', formatCurrency(data.guttersCost)]);
+            if (data.redecking) items.push([`Redeck (${data.redeckingSheetCount} sheets)`, formatCurrency(data.redeckingCost)]);
+            if (data.skylights > 0) items.push([`Skylights (${data.skylights})`, formatCurrency(data.skylightsCost)]);
+            if (data.gutters && data.gutterCustomerPrice > 0) items.push(['Gutters', formatCurrency(data.gutterCustomerPrice)]);
 
             items.forEach(item => {
                 checkPageBreak(5);
@@ -2046,14 +2243,14 @@
             doc.text('TOTAL QUOTE', margin, yPos);
             doc.setTextColor(192, 57, 43);
             doc.setFontSize(11);
-            doc.text(formatCurrency(data.quotePrice), pageWidth - margin, yPos, { align: 'right' });
+            doc.text(formatCurrency(data.combinedTotal), pageWidth - margin, yPos, { align: 'right' });
             doc.setTextColor(0, 0, 0);
             yPos += 9;
 
             // Financing
             doc.setFont(undefined, 'normal');
             doc.setFontSize(8);
-            const monthlyPayment = calculateMonthlyPayment(data.quotePrice);
+            const monthlyPayment = data.monthlyPayment;
             const financeText = `Estimated Monthly: ${formatCurrency(monthlyPayment)} for 60 months at 9.99% APR`;
             doc.text(financeText, margin, yPos);
             yPos += 4;
@@ -2216,7 +2413,11 @@
             if (data.redecking) scopeItems.push('Redecking services as required');
             if (data.chimney) scopeItems.push('Chimney flashing installation and repair');
             if (data.skylights > 0) scopeItems.push(`Installation of ${data.skylights} skylight(s)`);
-            if (data.gutters) scopeItems.push(`${data.guttersSize}" gutter system installation with ${data.guttersDownspouts} downspout(s) (${data.guttersStories} story)`);
+            if (data.gutters && data.guttersLinearFeet > 0) {
+                const storyText = data.guttersTwoStory ? '2-story' : '1-story';
+                const alurexText = data.guttersAlurex ? 'with Alu-rex cover' : 'seamless';
+                scopeItems.push(`${data.guttersSize}" gutter system (${alurexText}) installation, ${data.guttersLinearFeet} linear feet (${storyText})`);
+            }
             scopeItems.push('Complete tear-off and disposal of existing roofing');
             scopeItems.push('Underlayment, accessories, and flashing installation');
 
@@ -2241,19 +2442,14 @@
             doc.setFont(undefined, 'normal');
             doc.setFontSize(8.5);
 
-            // Calculate customer labor rate based on pitch
-            const customerLaborRate2 = data.pitch.customerRate;
-            const customerLaborCost2 = customerLaborRate2 * data.squares;
-
             const items = [
-                ['Roofing Material', formatCurrency(data.materialCostValue)],
-                ['Labor & Installation', formatCurrency(customerLaborCost2)],
-                ['Dump & Cleanup', formatCurrency(data.dumpCost)],
-                ['Accessories', formatCurrency(data.rubberAccessories)]
+                ['Roofing', formatCurrency(data.roofSubtotal)],
+                ['Dump & Cleanup', formatCurrency(data.dumpCost)]
             ];
 
-            if (data.addonsCost > 0) items.push(['Add-ons', formatCurrency(data.addonsCost)]);
-            if (data.guttersCost > 0) items.push(['Gutters', formatCurrency(data.guttersCost)]);
+            if (data.redecking) items.push([`Redeck (${data.redeckingSheetCount} sheets)`, formatCurrency(data.redeckingCost)]);
+            if (data.skylights > 0) items.push([`Skylights (${data.skylights})`, formatCurrency(data.skylightsCost)]);
+            if (data.gutters && data.gutterCustomerPrice > 0) items.push(['Gutters', formatCurrency(data.gutterCustomerPrice)]);
 
             items.forEach(item => {
                 checkPageBreak(5);
@@ -2273,15 +2469,14 @@
             doc.setFontSize(11);
             doc.text('TOTAL PRICE', margin, yPos);
             doc.setTextColor(192, 57, 43);
-            doc.text(formatCurrency(data.quotePrice), pageWidth - margin, yPos, { align: 'right' });
+            doc.text(formatCurrency(data.combinedTotal), pageWidth - margin, yPos, { align: 'right' });
             doc.setTextColor(0, 0, 0);
             yPos += 8;
 
             // Financing
             doc.setFont(undefined, 'normal');
             doc.setFontSize(8);
-            const monthlyPayment = calculateMonthlyPayment(data.quotePrice);
-            const financeText = `Estimated Monthly: ${formatCurrency(monthlyPayment)} for 60 months at 9.99% APR`;
+            const financeText = `Estimated Monthly: ${formatCurrency(data.monthlyPayment)} for 60 months at 9.99% APR`;
             doc.text(financeText, margin, yPos);
             yPos += 4;
             doc.setTextColor(150, 150, 150);
@@ -2394,10 +2589,11 @@
                 document.getElementById('redecking').value = data.redecking;
                 document.getElementById('chimney').value = data.chimney;
                 document.getElementById('gutters').value = data.gutters;
-                document.getElementById('guttersLinearFeet').value = data.guttersLinearFeet;
-                document.getElementById('guttersDownspouts').value = data.guttersDownspouts;
-                document.getElementById('guttersStories').value = data.guttersStories;
-                document.getElementById('guttersSize').value = data.guttersSize;
+                document.getElementById('guttersLinearFeet').value = data.guttersLinearFeet || '0';
+                document.getElementById('guttersSize').value = data.guttersSize || '6';
+                document.getElementById('guttersAlurex').value = data.guttersAlurex || 'no';
+                document.getElementById('guttersStories').value = data.guttersStories || 'no';
+                document.getElementById('gutterContractPrice').value = data.gutterContractPrice || '';
                 document.getElementById('product').value = data.product;
                 document.getElementById('crew').value = data.crew || 'greg';
                 document.getElementById('materialCostOverride').value = data.materialCostOverride || '';
@@ -2405,7 +2601,6 @@
                 document.getElementById('rubberAccessories').value = data.rubberAccessories || '0';
                 document.getElementById('duddySplit').value = data.duddySplit || 'no';
                 document.getElementById('marginSlider').value = data.marginSlider;
-                document.getElementById('marginPercentage').textContent = data.marginSlider + '%';
                 document.getElementById('jobNotes').value = data.jobNotes;
                 window.photos = data.photos || [];
                 renderPhotos();
@@ -2417,6 +2612,19 @@
                 document.querySelectorAll('[data-toggle="duddySplit"]').forEach(b => b.classList.remove('active'));
                 document.querySelector(`[data-toggle="duddySplit"][data-value="${data.duddySplit || 'no'}"]`).classList.add('active');
                 document.getElementById('duddySplitLabel').style.display = (data.duddySplit === 'yes') ? 'block' : 'none';
+
+                // Update other toggle buttons
+                document.querySelectorAll('[data-toggle="redecking"]').forEach(b => b.classList.remove('active'));
+                document.querySelector(`[data-toggle="redecking"][data-value="${data.redecking || 'no'}"]`).classList.add('active');
+
+                document.querySelectorAll('[data-toggle="guttersSize"]').forEach(b => b.classList.remove('active'));
+                document.querySelector(`[data-toggle="guttersSize"][data-value="${data.guttersSize || '6'}"]`).classList.add('active');
+
+                document.querySelectorAll('[data-toggle="guttersAlurex"]').forEach(b => b.classList.remove('active'));
+                document.querySelector(`[data-toggle="guttersAlurex"][data-value="${data.guttersAlurex || 'no'}"]`).classList.add('active');
+
+                document.querySelectorAll('[data-toggle="guttersStories"]').forEach(b => b.classList.remove('active'));
+                document.querySelector(`[data-toggle="guttersStories"][data-value="${data.guttersStories || 'no'}"]`).classList.add('active');
             } else {
                 document.getElementById('estimateNumber').value = generateEstimateNumber();
             }
