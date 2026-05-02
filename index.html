@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mrocek & Co - Roofing Quote Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,68 +12,59 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f5f5f5;
-            line-height: 1.6;
-        }
-
-        header {
-            background-color: #1a1a1a;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 4px solid #C0392B;
-        }
-
-        header h1 {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        header p {
-            font-size: 14px;
-            color: #ccc;
-            margin-bottom: 10px;
-        }
-
-        .header-contact {
-            font-size: 12px;
-            color: #aaa;
-        }
-
-        .header-contact span {
-            margin: 0 10px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: #f5f5f5;
+            color: #333;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+            display: flex;
+            min-height: 100vh;
         }
 
-        .form-wrapper {
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 20px;
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            max-width: 800px;
+            overflow-y: auto;
+        }
+
+        .sidebar {
+            width: 380px;
+            background: #fff;
+            border-left: 1px solid #ddd;
+            padding: 30px;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        header {
+            background: #1a1a1a;
+            color: white;
+            padding: 30px 40px;
             margin-bottom: 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        @media (max-width: 1024px) {
-            .form-wrapper {
-                grid-template-columns: 1fr;
-            }
+        header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
         }
 
         .form-section {
             background: white;
+            margin-bottom: 30px;
             padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
 
         .form-section h2 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: #1a1a1a;
             margin-bottom: 20px;
@@ -92,1102 +82,1044 @@
 
         label {
             display: block;
+            font-size: 13px;
             font-weight: 500;
+            color: #555;
             margin-bottom: 6px;
-            color: #333;
-            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         input[type="text"],
-        input[type="email"],
         input[type="tel"],
         input[type="number"],
-        select,
-        textarea {
+        select {
             width: 100%;
-            padding: 10px 12px;
+            padding: 12px 14px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            font-family: 'Inter', sans-serif;
             font-size: 14px;
+            font-family: inherit;
             transition: border-color 0.2s;
         }
 
         input[type="text"]:focus,
-        input[type="email"]:focus,
         input[type="tel"]:focus,
         input[type="number"]:focus,
-        select:focus,
-        textarea:focus {
+        select:focus {
             outline: none;
             border-color: #C0392B;
             box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.1);
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        @media (max-width: 768px) {
-            .two-column {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .three-column {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-        }
-
-        @media (max-width: 768px) {
-            .three-column {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .radio-group,
-        .checkbox-group {
+        .toggle-group {
             display: flex;
-            flex-direction: column;
             gap: 12px;
         }
 
-        .radio-item,
-        .checkbox-item {
-            display: flex;
-            align-items: center;
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
         }
 
-        input[type="radio"],
-        input[type="checkbox"] {
+        .toggle-btn.active {
+            background: #C0392B;
+            color: white;
+            border-color: #C0392B;
+        }
+
+        .toggle-btn:hover:not(.active) {
+            border-color: #C0392B;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .radio-option:hover {
+            background: #f9f9f9;
+        }
+
+        .radio-option input[type="radio"] {
             margin-right: 10px;
             cursor: pointer;
-            width: 18px;
-            height: 18px;
-            accent-color: #C0392B;
         }
 
-        .radio-item label,
-        .checkbox-item label {
-            margin-bottom: 0;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
+        .radio-option label {
+            margin: 0;
             flex: 1;
+            cursor: pointer;
+            text-transform: none;
+            letter-spacing: normal;
         }
 
-        .option-price {
-            font-size: 12px;
-            color: #666;
-            margin-left: 5px;
-        }
-
-        .quantity-input {
-            width: 60px;
-            padding: 6px;
-            margin-left: 10px;
-        }
-
-        /* Quote Summary Sidebar */
-        .quote-summary {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 20px;
-            height: fit-content;
-        }
-
-        .quote-summary h3 {
-            font-size: 16px;
-            font-weight: 600;
+        .sidebar h3 {
+            font-size: 18px;
+            font-weight: 700;
             color: #1a1a1a;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #C0392B;
         }
 
-        .summary-item {
+        .calc-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 12px;
             font-size: 13px;
-            padding: 8px 0;
-            color: #555;
-            border-bottom: 1px solid #f5f5f5;
         }
 
-        .summary-item.total {
-            font-size: 16px;
+        .calc-row label {
+            color: #666;
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: normal;
+            margin: 0;
+        }
+
+        .calc-row .value {
+            font-weight: 500;
+            color: #333;
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .calc-row.total {
+            border-top: 2px solid #ddd;
+            padding-top: 12px;
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .calc-row.total label {
             font-weight: 700;
             color: #1a1a1a;
-            border-bottom: 2px solid #C0392B;
-            padding: 12px 0;
-            margin-top: 10px;
         }
 
-        .summary-value {
-            text-align: right;
-            font-weight: 500;
+        .calc-row.total .value {
+            font-size: 16px;
+            color: #C0392B;
         }
 
-        .quote-number {
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 15px;
-            font-family: monospace;
-        }
-
-        /* Buttons */
-        .button-group {
-            display: flex;
-            gap: 10px;
+        .margin-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
             margin-top: 25px;
         }
 
-        button {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 4px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-primary {
-            background-color: #C0392B;
-            color: white;
-            flex: 1;
-        }
-
-        .btn-primary:hover {
-            background-color: #a02d23;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(192, 57, 43, 0.3);
-        }
-
-        .btn-secondary {
-            background-color: #f5f5f5;
-            color: #333;
-            border: 1px solid #ddd;
-            flex: 1;
-        }
-
-        .btn-secondary:hover {
-            background-color: #efefef;
-        }
-
-        .btn-small {
-            padding: 8px 12px;
-            font-size: 12px;
-            flex: none;
-        }
-
-        /* Info messages */
-        .info-box {
-            background-color: #f9f3f0;
-            border-left: 4px solid #C0392B;
-            padding: 12px;
-            border-radius: 4px;
+        .margin-section h4 {
             font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             color: #555;
+            margin-bottom: 12px;
+        }
+
+        .margin-slider-container {
             margin-bottom: 15px;
         }
 
-        .success-message {
-            background-color: #d4edda;
-            border-left-color: #28a745;
-            color: #155724;
-            display: none;
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #C0392B;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(192, 57, 43, 0.3);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #C0392B;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(192, 57, 43, 0.3);
+        }
+
+        .margin-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .margin-display .label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .margin-display .percentage {
+            font-size: 18px;
+            font-weight: 700;
+            color: #C0392B;
+        }
+
+        .cost-section {
+            background: #fff3e0;
+            padding: 15px;
+            border-left: 4px solid #C0392B;
+            border-radius: 2px;
+            margin-top: 12px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .cost-section label {
+            color: #555;
+        }
+
+        .cost-section .value {
+            font-weight: 600;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
             border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            z-index: 1000;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .success-message.show {
-            display: block;
-            animation: slideIn 0.3s ease-out;
+        .btn-primary {
+            background: #C0392B;
+            color: white;
         }
 
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+        .btn-primary:hover {
+            background: #a02e23;
+            box-shadow: 0 4px 12px rgba(192, 57, 43, 0.3);
         }
 
-        /* Print styles */
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .print-only {
+            display: none;
+        }
+
         @media print {
-            body {
-                background: white;
+            .sidebar,
+            header,
+            .button-group,
+            .margin-section {
+                display: none !important;
             }
 
-            header {
-                margin: -20px -20px 20px -20px;
-            }
-
-            .container {
+            .main-content {
                 max-width: 100%;
-                padding: 0;
+                padding: 20px;
             }
 
-            .form-wrapper {
-                display: block;
+            .print-only {
+                display: block !important;
             }
 
             .form-section {
                 page-break-inside: avoid;
                 box-shadow: none;
-                border: 1px solid #eee;
-                margin-bottom: 20px;
+                border: 1px solid #ddd;
             }
 
-            .quote-summary {
-                position: static;
-                margin-top: 30px;
-                border: 2px solid #1a1a1a;
-                padding: 20px;
-            }
-
-            .button-group {
-                display: none;
-            }
-
-            .success-message {
-                display: none !important;
-            }
-
-            input[type="text"],
-            input[type="email"],
-            input[type="tel"],
-            input[type="number"],
-            select,
-            textarea {
-                border: 1px solid #999;
-            }
-
-            .terms-section {
-                margin-top: 30px;
-                font-size: 11px;
-                line-height: 1.4;
-            }
-
-            .signature-line {
-                margin-top: 40px;
-                border-top: 1px solid #000;
-                width: 40%;
-                padding-top: 10px;
-                font-size: 12px;
+            body {
+                background: white;
             }
         }
 
-        .terms-section {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 4px;
+        .quote-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #1a1a1a;
+        }
+
+        .quote-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .quote-header p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .quote-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+            font-size: 13px;
+        }
+
+        .quote-info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quote-info-item label {
+            color: #999;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .quote-info-item .value {
+            font-weight: 500;
+        }
+
+        .line-items {
+            margin-bottom: 30px;
+        }
+
+        .line-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 13px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .line-item.section-header {
+            font-weight: 600;
+            color: #1a1a1a;
+            padding-top: 15px;
+            padding-bottom: 10px;
+            background: #f9f9f9;
+            padding-left: 10px;
+            padding-right: 10px;
+            margin-left: -10px;
+            margin-right: -10px;
+        }
+
+        .line-item.subtotal {
+            font-weight: 600;
+            padding-top: 15px;
+            border-top: 2px solid #ddd;
+        }
+
+        .quote-total {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 0;
+            border-top: 3px solid #C0392B;
+            margin-top: 20px;
+            color: #1a1a1a;
+        }
+
+        .quote-total .value {
+            color: #C0392B;
+        }
+
+        .terms {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 11px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .terms h3 {
             font-size: 12px;
-            line-height: 1.5;
-            color: #555;
-            display: none;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            margin-top: 12px;
         }
 
-        .terms-section.show {
-            display: block;
+        .signature-block {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .signature-item {
+            width: 45%;
+            font-size: 11px;
         }
 
         .signature-line {
-            display: none;
+            border-top: 1px solid #333;
+            margin-top: 30px;
+            padding-top: 5px;
         }
 
-        .signature-line.show {
-            display: block;
-            margin-top: 40px;
-            border-top: 1px solid #000;
-            width: 40%;
-            padding-top: 10px;
-            font-size: 12px;
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: static;
+                height: auto;
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid #ddd;
+            }
         }
 
-        /* Responsive adjustments */
         @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+
+            .sidebar {
+                padding: 20px;
+            }
+
+            header {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
             header h1 {
-                font-size: 24px;
+                font-size: 22px;
             }
 
             .form-section {
                 padding: 18px;
             }
 
-            .button-group {
-                flex-direction: column;
-            }
-
             input[type="text"],
-            input[type="email"],
             input[type="tel"],
             input[type="number"],
-            select,
-            textarea {
+            select {
+                padding: 14px;
                 font-size: 16px;
+            }
+
+            .quote-info {
+                grid-template-columns: 1fr;
             }
         }
 
-        .hidden {
+        .hidden-print {
             display: none;
         }
 
-        .addon-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background: #fafafa;
-            border-radius: 4px;
-            margin-bottom: 8px;
-        }
-
-        .addon-label {
-            flex: 1;
-        }
-
-        .addon-price {
-            font-size: 13px;
-            color: #666;
-            margin-right: 10px;
+        @media print {
+            .hidden-print {
+                display: none !important;
+            }
         }
     </style>
 </head>
 <body>
     <header>
         <h1>MROCEK & CO</h1>
-        <p>Roofing, Construction, Repairs, Installation</p>
-        <div class="header-contact">
-            <span>Phone: 724-496-9434</span>
-            <span>Pittsburgh, PA area</span>
-        </div>
     </header>
 
     <div class="container">
-        <div class="form-wrapper">
-            <form id="quoteForm">
-                <!-- CUSTOMER INFORMATION -->
-                <div class="form-section">
-                    <h2>Customer Information</h2>
-
-                    <div class="form-group">
-                        <label for="customerName">Customer Name *</label>
-                        <input type="text" id="customerName" name="customerName" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="address">Address *</label>
-                        <input type="text" id="address" name="address" required>
-                    </div>
-
-                    <div class="three-column">
-                        <div class="form-group">
-                            <label for="city">City *</label>
-                            <input type="text" id="city" name="city" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="state">State *</label>
-                            <input type="text" id="state" name="state" value="PA" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="zip">ZIP *</label>
-                            <input type="text" id="zip" name="zip" required>
-                        </div>
-                    </div>
-
-                    <div class="two-column">
-                        <div class="form-group">
-                            <label for="phone">Phone *</label>
-                            <input type="tel" id="phone" name="phone" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Insurance Claim?</label>
-                        <div class="radio-group">
-                            <div class="radio-item">
-                                <input type="radio" id="insNo" name="hasInsurance" value="no" checked>
-                                <label for="insNo">No</label>
-                            </div>
-                            <div class="radio-item">
-                                <input type="radio" id="insYes" name="hasInsurance" value="yes">
-                                <label for="insYes">Yes</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group hidden" id="insuranceCompanyGroup">
-                        <label for="insuranceCompany">Insurance Company</label>
-                        <input type="text" id="insuranceCompany" name="insuranceCompany">
-                    </div>
+        <div class="main-content">
+            <!-- Customer Info Section -->
+            <div class="form-section">
+                <h2>Customer Information</h2>
+                <div class="form-group">
+                    <label>Client Name</label>
+                    <input type="text" id="clientName" placeholder="Enter client name">
                 </div>
-
-                <!-- ROOF DETAILS -->
-                <div class="form-section">
-                    <h2>Roof Details</h2>
-
-                    <div class="two-column">
-                        <div class="form-group">
-                            <label for="roofSize">Roof Size (sq ft) *</label>
-                            <input type="number" id="roofSize" name="roofSize" min="0" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="roofSquares">Roofing Squares</label>
-                            <input type="number" id="roofSquares" name="roofSquares" readonly style="background-color: #f5f5f5;">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="stories">Number of Stories *</label>
-                        <select id="stories" name="stories" required>
-                            <option value="">Select...</option>
-                            <option value="1">1 Story</option>
-                            <option value="1.5">1.5 Stories</option>
-                            <option value="2">2 Stories</option>
-                            <option value="2.5">2.5 Stories</option>
-                            <option value="3">3 Stories</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="roofPitch">Roof Pitch *</label>
-                        <select id="roofPitch" name="roofPitch" required>
-                            <option value="">Select...</option>
-                            <option value="low">Low (3:12 - 5:12)</option>
-                            <option value="medium">Medium (6:12 - 9:12)</option>
-                            <option value="steep">Steep (10:12+)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="existingLayers">Number of Existing Layers *</label>
-                        <select id="existingLayers" name="existingLayers" required>
-                            <option value="">Select...</option>
-                            <option value="1">1 Layer</option>
-                            <option value="2">2 Layers</option>
-                            <option value="3">3+ Layers</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Tear-Off Required?</label>
-                        <div class="radio-group">
-                            <div class="radio-item">
-                                <input type="radio" id="tearoffNo" name="tearoff" value="no" checked>
-                                <label for="tearoffNo">No</label>
-                            </div>
-                            <div class="radio-item">
-                                <input type="radio" id="tearoffYes" name="tearoff" value="yes">
-                                <label for="tearoffYes">Yes</label>
-                            </div>
-                        </div>
-                    </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" id="clientPhone" placeholder="Enter phone number">
                 </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" id="clientAddress" placeholder="Enter property address">
+                </div>
+                <div class="form-group">
+                    <label>Estimate Number</label>
+                    <input type="text" id="estimateNumber" placeholder="Auto-generated">
+                </div>
+            </div>
 
-                <!-- SERVICE TYPE -->
-                <div class="form-section">
-                    <h2>Service Type</h2>
+            <!-- Roof Details Section -->
+            <div class="form-section">
+                <h2>Roof Details</h2>
+                <div class="form-group">
+                    <label>Number of Squares</label>
+                    <input type="number" id="squares" min="0" step="0.5" placeholder="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Pitch</label>
+                    <select id="pitch">
+                        <option value="4">4:12</option>
+                        <option value="5">5:12</option>
+                        <option value="6">6:12</option>
+                        <option value="7">7:12</option>
+                        <option value="8">8:12</option>
+                        <option value="9">9:12</option>
+                        <option value="10">10:12</option>
+                        <option value="11">11:12</option>
+                        <option value="12">12:12</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Redecking</label>
+                    <div class="toggle-group">
+                        <button type="button" class="toggle-btn active" data-toggle="redecking" data-value="no">No</button>
+                        <button type="button" class="toggle-btn" data-toggle="redecking" data-value="yes">Yes</button>
+                    </div>
+                    <input type="hidden" id="redecking" value="no">
+                </div>
+                <div class="form-group">
+                    <label>Chimney Flashing</label>
+                    <div class="toggle-group">
+                        <button type="button" class="toggle-btn active" data-toggle="chimney" data-value="no">No</button>
+                        <button type="button" class="toggle-btn" data-toggle="chimney" data-value="yes">Yes</button>
+                    </div>
+                    <input type="hidden" id="chimney" value="no">
+                </div>
+                <div class="form-group">
+                    <label>Skylights</label>
+                    <input type="number" id="skylights" min="0" placeholder="0" value="0">
+                </div>
+            </div>
+
+            <!-- Product Selection Section -->
+            <div class="form-section">
+                <h2>Product Selection</h2>
+                <div class="form-group">
+                    <label>Manufacturer</label>
                     <div class="radio-group">
-                        <div class="radio-item">
-                            <input type="radio" id="serviceReplacement" name="serviceType" value="replacement" checked>
-                            <label for="serviceReplacement">Full Roof Replacement</label>
+                        <div class="radio-option">
+                            <input type="radio" id="mfg-oc" name="manufacturer" value="oc" checked>
+                            <label for="mfg-oc">Owens Corning</label>
                         </div>
-                        <div class="radio-item">
-                            <input type="radio" id="serviceRepair" name="serviceType" value="repair">
-                            <label for="serviceRepair">Roof Repair</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="serviceInstallation" name="serviceType" value="installation">
-                            <label for="serviceInstallation">New Installation</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="serviceGutters" name="serviceType" value="gutters">
-                            <label for="serviceGutters">Gutters & Downspouts</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="serviceSoffit" name="serviceType" value="soffit">
-                            <label for="serviceSoffit">Soffit & Fascia</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="serviceWaterproofing" name="serviceType" value="waterproofing">
-                            <label for="serviceWaterproofing">Waterproofing</label>
+                        <div class="radio-option">
+                            <input type="radio" id="mfg-gaf" name="manufacturer" value="gaf">
+                            <label for="mfg-gaf">GAF</label>
                         </div>
                     </div>
                 </div>
-
-                <!-- MATERIAL SELECTION -->
-                <div class="form-section" id="materialSection">
-                    <h2>Material Selection</h2>
-                    <div class="info-box">
-                        Prices shown are installed costs per square foot.
-                    </div>
-                    <div class="radio-group">
-                        <div class="radio-item">
-                            <input type="radio" id="mat3tab" name="material" value="3tab" data-price="3.50">
-                            <label for="mat3tab">
-                                3-Tab Asphalt Shingles (Economy)
-                                <span class="option-price">$3.50/sq ft</span>
-                            </label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="matArch" name="material" value="arch" data-price="4.50" checked>
-                            <label for="matArch">
-                                Architectural Shingles (Standard)
-                                <span class="option-price">$4.50/sq ft</span>
-                            </label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="matPremium" name="material" value="premium" data-price="6.00">
-                            <label for="matPremium">
-                                Premium Architectural (Designer)
-                                <span class="option-price">$6.00/sq ft</span>
-                            </label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="matMetal" name="material" value="metal" data-price="9.00">
-                            <label for="matMetal">
-                                Metal Standing Seam
-                                <span class="option-price">$9.00/sq ft</span>
-                            </label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="matFlat" name="material" value="flat" data-price="7.00">
-                            <label for="matFlat">
-                                Flat/TPO (Commercial)
-                                <span class="option-price">$7.00/sq ft</span>
-                            </label>
-                        </div>
-                    </div>
+                <div class="form-group">
+                    <label>Product</label>
+                    <select id="product">
+                        <!-- OC products (default) -->
+                        <option value="oc-duration" data-price="85">Duration (3-tab economy) - $85/sq</option>
+                        <option value="oc-designer" data-price="110">Duration Designer - $110/sq</option>
+                        <option value="oc-oakridge" data-price="95">Oakridge - $95/sq</option>
+                        <option value="oc-trudef" data-price="100">TruDefinition Duration - $100/sq</option>
+                        <option value="oc-flex" data-price="105">Duration FLEX - $105/sq</option>
+                        <option value="oc-storm" data-price="115">Duration STORM - $115/sq</option>
+                    </select>
                 </div>
+            </div>
+        </div>
 
-                <!-- ADD-ONS -->
-                <div class="form-section">
-                    <h2>Add-Ons</h2>
+        <!-- Sidebar Calculations -->
+        <div class="sidebar">
+            <h3>Quote Breakdown</h3>
 
-                    <div class="checkbox-group">
-                        <div class="addon-item">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="addon1" name="addons" value="iceShield" data-type="per-sqft" data-price="0.75">
-                                <label for="addon1" class="addon-label">Ice & Water Shield (full deck)</label>
-                            </div>
-                            <span class="addon-price">$0.75/sq ft</span>
-                        </div>
+            <div class="calc-row">
+                <label>Material Cost</label>
+                <div class="value" id="materialCost">$0.00</div>
+            </div>
+            <div class="calc-row">
+                <label>Labor (150/sq)</label>
+                <div class="value" id="laborCost">$0.00</div>
+            </div>
+            <div class="calc-row">
+                <label>Tear-off & Dump</label>
+                <div class="value" id="tearoffCost">$0.00</div>
+            </div>
+            <div class="calc-row">
+                <label>Underlayment & Accessories</label>
+                <div class="value" id="underlaymentCost">$0.00</div>
+            </div>
+            <div class="calc-row">
+                <label>Add-ons Total</label>
+                <div class="value" id="addonsCost">$0.00</div>
+            </div>
+            <div class="calc-row">
+                <label>Subtotal (before surcharge)</label>
+                <div class="value" id="subtotal">$0.00</div>
+            </div>
+            <div class="calc-row">
+                <label>Pitch Surcharge</label>
+                <div class="value" id="pitchSurcharge">$0.00</div>
+            </div>
+            <div class="calc-row total">
+                <label>COST TO MROCEK</label>
+                <div class="value" id="totalCost">$0.00</div>
+            </div>
 
-                        <div class="addon-item">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="addon2" name="addons" value="underlayment" data-type="per-sqft" data-price="0.50">
-                                <label for="addon2" class="addon-label">Synthetic Underlayment</label>
-                            </div>
-                            <span class="addon-price">$0.50/sq ft</span>
-                        </div>
-
-                        <div class="addon-item">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="addon3" name="addons" value="ridgeVent" data-type="fixed" data-price="600">
-                                <label for="addon3" class="addon-label">Ridge Vent (40 lf typical)</label>
-                            </div>
-                            <span class="addon-price">$600 flat</span>
-                        </div>
-
-                        <div class="addon-item">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="addon4" name="addons" value="dripEdge" data-type="fixed" data-price="400">
-                                <label for="addon4" class="addon-label">Drip Edge (est. perimeter)</label>
-                            </div>
-                            <span class="addon-price">$400 flat</span>
-                        </div>
-
-                        <div class="addon-item">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="addon5" name="addons" value="newFlashing" data-type="fixed" data-price="500">
-                                <label for="addon5" class="addon-label">New Flashing</label>
-                            </div>
-                            <span class="addon-price">$500 flat</span>
-                        </div>
-
-                        <div class="addon-item">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="addon6" name="addons" value="chimneyFlashing" data-type="fixed" data-price="750">
-                                <label for="addon6" class="addon-label">Chimney Flashing</label>
-                            </div>
-                            <span class="addon-price">$750 flat</span>
-                        </div>
-
-                        <div class="addon-item">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="addon7" name="addons" value="skylightFlashing" data-type="quantity" data-price="400">
-                                <label for="addon7" class="addon-label">Skylight Flashing</label>
-                            </div>
-                            <input type="number" id="addon7Qty" class="quantity-input" min="0" value="0" placeholder="Qty">
-                            <span class="addon-price">$400 each</span>
-                        </div>
-
-                        <div class="addon-item">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="addon8" name="addons" value="pipeBoot" data-type="quantity" data-price="75">
-                                <label for="addon8" class="addon-label">Pipe Boot Replacement</label>
-                            </div>
-                            <input type="number" id="addon8Qty" class="quantity-input" min="0" value="0" placeholder="Qty">
-                            <span class="addon-price">$75 each</span>
-                        </div>
-
-                        <div class="addon-item">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="addon9" name="addons" value="gutterInstall" data-type="per-sqft" data-price="8.00">
-                                <label for="addon9" class="addon-label">Gutter Installation</label>
-                            </div>
-                            <span class="addon-price">$8/linear ft</span>
-                        </div>
-
-                        <div class="addon-item">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="addon10" name="addons" value="downspout" data-type="per-sqft" data-price="12.00">
-                                <label for="addon10" class="addon-label">Downspout Installation</label>
-                            </div>
-                            <span class="addon-price">$12/linear ft</span>
-                        </div>
-
-                        <div class="addon-item">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="addon11" name="addons" value="soffitRepair" data-type="per-sqft" data-price="12">
-                                <label for="addon11" class="addon-label">Soffit Repair</label>
-                            </div>
-                            <span class="addon-price">$12/sq ft</span>
-                        </div>
-
-                        <div class="addon-item">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="addon12" name="addons" value="fasciaReplace" data-type="per-sqft" data-price="10">
-                                <label for="addon12" class="addon-label">Fascia Replacement</label>
-                            </div>
-                            <span class="addon-price">$10/linear ft</span>
-                        </div>
-
-                        <div class="addon-item">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="addon13" name="addons" value="dumpster" data-type="fixed" data-price="500">
-                                <label for="addon13" class="addon-label">Dumpster/Debris Removal</label>
-                            </div>
-                            <span class="addon-price">$500 flat</span>
-                        </div>
+            <div class="margin-section">
+                <h4>Margin Settings</h4>
+                <div class="margin-display">
+                    <span class="label">Markup Percentage</span>
+                    <span class="percentage" id="marginPercentage">35%</span>
+                </div>
+                <div class="margin-slider-container">
+                    <input type="range" id="marginSlider" min="0" max="100" value="35" step="1">
+                </div>
+                <div class="cost-section">
+                    <div class="calc-row">
+                        <label>Margin Amount</label>
+                        <div class="value" id="marginAmount">$0.00</div>
                     </div>
                 </div>
+            </div>
 
-                <!-- WARRANTY OPTIONS -->
-                <div class="form-section">
-                    <h2>Warranty Options</h2>
-                    <div class="radio-group">
-                        <div class="radio-item">
-                            <input type="radio" id="warStandard" name="warranty" value="standard" data-price="0" checked>
-                            <label for="warStandard">
-                                Standard Manufacturer Warranty
-                                <span class="option-price">Included</span>
-                            </label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="war25" name="warranty" value="25year" data-price="500">
-                            <label for="war25">
-                                Extended 25-Year Workmanship Warranty
-                                <span class="option-price">+$500</span>
-                            </label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="war50" name="warranty" value="50year" data-price="1200">
-                            <label for="war50">
-                                Premium 50-Year Full Coverage
-                                <span class="option-price">+$1,200</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
+            <div class="calc-row total" style="margin-top: 20px;">
+                <label>QUOTE PRICE</label>
+                <div class="value" id="quotePrice">$0.00</div>
+            </div>
 
-                <!-- ADJUSTMENTS -->
-                <div class="form-section">
-                    <h2>Adjustments & Options</h2>
+            <div class="calc-row" style="margin-top: 8px;">
+                <label>Price per Square</label>
+                <div class="value" id="pricePerSquare">$0.00</div>
+            </div>
 
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="permitFee" name="permitFee">
-                            Permit Fee (+$350)
-                        </label>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="discountAmount">Discount ($ or %)</label>
-                        <div class="two-column">
-                            <input type="number" id="discountAmount" name="discountAmount" min="0" step="0.01" placeholder="Amount">
-                            <select id="discountType" name="discountType">
-                                <option value="dollar">Dollar Amount</option>
-                                <option value="percent">Percentage</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="info-box">
-                        Steep pitch surcharge (15%) and multi-story surcharge (10%) are automatically calculated.
-                    </div>
-                </div>
-
-                <!-- NOTES -->
-                <div class="form-section">
-                    <h2>Special Notes</h2>
-                    <div class="form-group">
-                        <label for="notes">Additional Details, Damage Notes, etc.</label>
-                        <textarea id="notes" name="notes"></textarea>
-                    </div>
-                </div>
-
-                <!-- TERMS (shown on print) -->
-                <div class="form-section terms-section" id="termsSection">
-                    <h2>Terms & Conditions</h2>
-                    <p><strong>Quote Valid:</strong> 30 days from date of quote</p>
-                    <p><strong>Payment Terms:</strong> Payment due within 30 days of invoice date</p>
-                    <p><strong>Weather:</strong> Work subject to weather conditions. Schedule may be adjusted due to rain or extreme temperatures.</p>
-                    <p><strong>Site Conditions:</strong> Quote based on accessible site conditions. Additional costs may apply if unforeseen damage or structural issues are discovered during work.</p>
-                    <p><strong>Warranty:</strong> Workmanship warranted as selected above. Material warranties per manufacturer specifications.</p>
-                    <p style="margin-top: 15px; font-size: 11px; color: #666;">Thank you for choosing Mrocek & Co for your roofing needs.</p>
-                </div>
-
-                <div class="signature-line" id="signatureLine">
-                    Authorized Signature: _____________________________ Date: __________
-                </div>
-
-                <!-- BUTTONS -->
-                <div class="button-group">
-                    <button type="button" class="btn-secondary btn-small" id="clearBtn">Clear Form</button>
-                    <button type="button" class="btn-primary" id="pdfBtn">Generate PDF Quote</button>
-                </div>
-            </form>
-
-            <!-- QUOTE SUMMARY SIDEBAR -->
-            <div class="quote-summary">
-                <div class="quote-number">Quote #: <span id="quoteNumber">MRC-2026-0001</span></div>
-
-                <div class="summary-item">
-                    <span>Material Cost:</span>
-                    <span class="summary-value">$<span id="materialCost">0.00</span></span>
-                </div>
-
-                <div class="summary-item">
-                    <span>Tear-Off Cost:</span>
-                    <span class="summary-value">$<span id="tearoffCost">0.00</span></span>
-                </div>
-
-                <div class="summary-item">
-                    <span>Add-Ons:</span>
-                    <span class="summary-value">$<span id="addonsCost">0.00</span></span>
-                </div>
-
-                <div class="summary-item">
-                    <span>Subtotal:</span>
-                    <span class="summary-value">$<span id="subtotal">0.00</span></span>
-                </div>
-
-                <div class="summary-item">
-                    <span>Steep Pitch (15%):</span>
-                    <span class="summary-value">$<span id="steepSurcharge">0.00</span></span>
-                </div>
-
-                <div class="summary-item">
-                    <span>Multi-Story (10%):</span>
-                    <span class="summary-value">$<span id="storySurcharge">0.00</span></span>
-                </div>
-
-                <div class="summary-item">
-                    <span>Warranty Upgrade:</span>
-                    <span class="summary-value">$<span id="warrantyCost">0.00</span></span>
-                </div>
-
-                <div class="summary-item">
-                    <span>Permit Fee:</span>
-                    <span class="summary-value">$<span id="permitCost">0.00</span></span>
-                </div>
-
-                <div class="summary-item">
-                    <span>Discount:</span>
-                    <span class="summary-value">-$<span id="discountCost">0.00</span></span>
-                </div>
-
-                <div class="summary-item">
-                    <span>Sales Tax (7% materials):</span>
-                    <span class="summary-value">$<span id="tax">0.00</span></span>
-                </div>
-
-                <div class="summary-item total">
-                    <span>TOTAL QUOTE</span>
-                    <span class="summary-value">$<span id="totalQuote">0.00</span></span>
-                </div>
-
-                <div style="font-size: 12px; color: #999; margin-top: 15px; text-align: center;">
-                    Updated: <span id="lastUpdate">--:--</span>
-                </div>
+            <div class="button-group">
+                <button class="btn-secondary" onclick="resetForm()">Reset</button>
+                <button class="btn-primary" onclick="generatePDF()">Generate Quote</button>
             </div>
         </div>
     </div>
 
-    <div class="success-message" id="successMessage">Quote PDF generated successfully!</div>
-
     <script>
-        // Initialize
-        const form = document.getElementById('quoteForm');
-        const quoteNumber = document.getElementById('quoteNumber');
-
-        // Generate quote number
-        function generateQuoteNumber() {
-            const year = new Date().getFullYear();
-            const random = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
-            return `MRC-${year}-${random}`;
+        // Initialize estimate number on load
+        function generateEstimateNumber() {
+            const date = new Date();
+            const dateStr = date.toISOString().slice(0, 10).replace(/-/g, '');
+            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            return `EST-${dateStr}-${random}`;
         }
 
-        // Load from localStorage on page load
-        function loadFromStorage() {
-            const saved = localStorage.getItem('mrocekQuote');
-            if (saved) {
-                const data = JSON.parse(saved);
-                Object.keys(data).forEach(key => {
-                    const element = document.getElementById(key) || document.querySelector(`[name="${key}"]`);
-                    if (element) {
-                        if (element.type === 'radio' || element.type === 'checkbox') {
-                            if (element.type === 'radio') {
-                                document.querySelector(`[name="${key}"][value="${data[key]}"]`).checked = true;
-                            } else {
-                                element.checked = data[key];
-                            }
-                        } else {
-                            element.value = data[key];
-                        }
-                    }
+        // Set up toggle buttons
+        function setupToggles() {
+            document.querySelectorAll('[data-toggle]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const toggleName = this.getAttribute('data-toggle');
+                    const value = this.getAttribute('data-value');
+                    document.getElementById(toggleName).value = value;
+
+                    // Update button styles
+                    document.querySelectorAll(`[data-toggle="${toggleName}"]`).forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    this.classList.add('active');
+
+                    calculateAll();
                 });
-                quoteNumber.textContent = data.quoteNumber || generateQuoteNumber();
-            } else {
-                quoteNumber.textContent = generateQuoteNumber();
-            }
+            });
         }
 
-        // Save to localStorage on change
-        function saveToStorage() {
-            const data = {
-                quoteNumber: quoteNumber.textContent
+        // Manufacturer and product selection
+        document.querySelectorAll('input[name="manufacturer"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateProductOptions(this.value);
+                calculateAll();
+            });
+        });
+
+        function updateProductOptions(manufacturer) {
+            const productSelect = document.getElementById('product');
+            productSelect.innerHTML = '';
+
+            const products = {
+                oc: [
+                    { value: 'oc-duration', label: 'Duration (3-tab economy) - $85/sq', price: 85 },
+                    { value: 'oc-designer', label: 'Duration Designer - $110/sq', price: 110 },
+                    { value: 'oc-oakridge', label: 'Oakridge - $95/sq', price: 95 },
+                    { value: 'oc-trudef', label: 'TruDefinition Duration - $100/sq', price: 100 },
+                    { value: 'oc-flex', label: 'Duration FLEX - $105/sq', price: 105 },
+                    { value: 'oc-storm', label: 'Duration STORM - $115/sq', price: 115 }
+                ],
+                gaf: [
+                    { value: 'gaf-royal', label: 'Royal Sovereign (3-tab) - $80/sq', price: 80 },
+                    { value: 'gaf-hdz', label: 'Timberline HDZ - $100/sq', price: 100 },
+                    { value: 'gaf-hdzrs', label: 'Timberline HDZ RS+ - $110/sq', price: 110 },
+                    { value: 'gaf-asii', label: 'Timberline AS II - $120/sq', price: 120 },
+                    { value: 'gaf-uhdz', label: 'Timberline UHDZ - $130/sq', price: 130 },
+                    { value: 'gaf-camelot', label: 'Camelot II - $150/sq', price: 150 }
+                ]
             };
 
-            form.querySelectorAll('input, select, textarea').forEach(el => {
-                if (el.type === 'checkbox') {
-                    data[el.name] = el.checked;
-                } else if (el.type === 'radio') {
-                    if (el.checked) {
-                        data[el.name] = el.value;
-                    }
-                } else {
-                    data[el.id || el.name] = el.value;
-                }
+            products[manufacturer].forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.value;
+                option.textContent = product.label;
+                option.setAttribute('data-price', product.price);
+                productSelect.appendChild(option);
             });
-
-            localStorage.setItem('mrocekQuote', JSON.stringify(data));
         }
 
-        // Toggle insurance company field
-        document.querySelectorAll('input[name="hasInsurance"]').forEach(el => {
-            el.addEventListener('change', function() {
-                document.getElementById('insuranceCompanyGroup').classList.toggle('hidden', this.value === 'no');
-            });
+        // Event listeners for calculations
+        document.getElementById('squares').addEventListener('input', calculateAll);
+        document.getElementById('pitch').addEventListener('change', calculateAll);
+        document.getElementById('skylights').addEventListener('input', calculateAll);
+        document.getElementById('product').addEventListener('change', calculateAll);
+        document.getElementById('marginSlider').addEventListener('input', function() {
+            document.getElementById('marginPercentage').textContent = this.value + '%';
+            calculateAll();
         });
 
-        // Toggle material selection section
-        document.querySelectorAll('input[name="serviceType"]').forEach(el => {
-            el.addEventListener('change', function() {
-                const showMaterials = ['replacement', 'installation'].includes(this.value);
-                document.getElementById('materialSection').classList.toggle('hidden', !showMaterials);
-                if (!showMaterials) {
-                    document.querySelectorAll('input[name="material"]').forEach(m => m.checked = false);
-                }
-            });
-        });
+        function calculateAll() {
+            const squares = parseFloat(document.getElementById('squares').value) || 0;
+            const pitch = parseInt(document.getElementById('pitch').value) || 4;
+            const skylights = parseInt(document.getElementById('skylights').value) || 0;
+            const redecking = document.getElementById('redecking').value === 'yes' ? 1 : 0;
+            const chimney = document.getElementById('chimney').value === 'yes' ? 1 : 0;
+            const marginPercent = parseInt(document.getElementById('marginSlider').value) || 35;
 
-        // Update roofing squares
-        document.getElementById('roofSize').addEventListener('input', function() {
-            const squares = this.value ? (parseFloat(this.value) / 100).toFixed(2) : '0.00';
-            document.getElementById('roofSquares').value = squares;
-            calculateQuote();
-        });
+            // Get material price
+            const productSelect = document.getElementById('product');
+            const materialPrice = parseFloat(productSelect.options[productSelect.selectedIndex].getAttribute('data-price')) || 0;
 
-        // All form changes trigger calculation
-        form.addEventListener('change', function() {
-            calculateQuote();
-            saveToStorage();
-        });
+            // Base costs per square
+            const labor = 150;
+            const tearoff = 75;
+            const dump = 30;
+            const underlayment = 45;
+            const accessories = 20;
+            const nails = 10;
+            const flashing = 15;
 
-        form.addEventListener('input', function() {
-            calculateQuote();
-            saveToStorage();
-        });
+            // Calculate costs
+            const materialCost = materialPrice * squares;
+            const laborCost = labor * squares;
+            const tearoffCost = (tearoff + dump) * squares;
+            const underlaymentCost = (underlayment + accessories + nails + flashing) * squares;
 
-        // Calculate quote
-        function calculateQuote() {
-            // Get values
-            const roofSize = parseFloat(document.getElementById('roofSize').value) || 0;
-            const stories = parseFloat(document.getElementById('stories').value) || 1;
-            const roofPitch = document.getElementById('roofPitch').value;
-            const tearoff = document.querySelector('input[name="tearoff"]:checked')?.value === 'yes';
-            const existingLayers = parseInt(document.getElementById('existingLayers').value) || 1;
-            const serviceType = document.querySelector('input[name="serviceType"]:checked')?.value;
-            const material = document.querySelector('input[name="material"]:checked');
-            const materialPrice = material ? parseFloat(material.dataset.price) : 0;
-            const warranty = document.querySelector('input[name="warranty"]:checked');
-            const warrantyCost = warranty ? parseFloat(warranty.dataset.price) : 0;
-            const permitChecked = document.getElementById('permitFee').checked;
-            const discountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
-            const discountType = document.getElementById('discountType').value;
-
-            // Calculate material cost (main material)
-            let materialCost = roofSize * materialPrice;
-
-            // Calculate tear-off cost
-            let tearoffCost = 0;
-            if (tearoff && roofSize > 0) {
-                tearoffCost = roofSize * 1.50 * existingLayers;
-            }
-
-            // Calculate add-ons
-            let addonsCost = 0;
-            document.querySelectorAll('input[name="addons"]:checked').forEach(addon => {
-                const type = addon.dataset.type;
-                const price = parseFloat(addon.dataset.price);
-
-                if (type === 'per-sqft') {
-                    addonsCost += roofSize * price;
-                } else if (type === 'fixed') {
-                    addonsCost += price;
-                } else if (type === 'quantity') {
-                    const qtyId = addon.id + 'Qty';
-                    const qty = parseInt(document.getElementById(qtyId)?.value) || 0;
-                    addonsCost += qty * price;
-                }
-            });
+            // Add-ons
+            const redeckingCost = redecking * 75 * squares;
+            const chimneyCost = chimney * 450;
+            const skylightsCost = skylights * 400;
+            const addonsCost = redeckingCost + chimneyCost + skylightsCost;
 
             // Subtotal
-            let subtotal = materialCost + tearoffCost + addonsCost;
+            const subtotal = materialCost + laborCost + tearoffCost + underlaymentCost + addonsCost;
 
-            // Steep pitch surcharge (15% of material + tearoff)
-            let steepSurcharge = 0;
-            if (roofPitch === 'steep') {
-                steepSurcharge = (materialCost + tearoffCost) * 0.15;
-                subtotal += steepSurcharge;
+            // Pitch surcharge
+            let pitchSurcharge = 0;
+            if (pitch >= 7 && pitch <= 8) {
+                pitchSurcharge = subtotal * 0.10;
+            } else if (pitch >= 9 && pitch <= 10) {
+                pitchSurcharge = subtotal * 0.20;
+            } else if (pitch >= 11 && pitch <= 12) {
+                pitchSurcharge = subtotal * 0.30;
             }
 
-            // Multi-story surcharge (10%)
-            let storySurcharge = 0;
-            if (stories >= 2) {
-                storySurcharge = (materialCost + tearoffCost) * 0.10;
-                subtotal += storySurcharge;
-            }
+            // Total cost to Mrocek
+            const totalCost = subtotal + pitchSurcharge;
 
-            // Add warranty
-            subtotal += warrantyCost;
-
-            // Add permit
-            const permitCost = permitChecked ? 350 : 0;
-            subtotal += permitCost;
-
-            // Calculate discount
-            let discountCost = 0;
-            if (discountAmount > 0) {
-                if (discountType === 'percent') {
-                    discountCost = subtotal * (discountAmount / 100);
-                } else {
-                    discountCost = discountAmount;
-                }
-            }
-            subtotal -= discountCost;
-
-            // Tax (7% on materials only, estimate 40% of total is materials)
-            const materialsPercentage = subtotal * 0.40;
-            const tax = materialsPercentage * 0.07;
-            const total = subtotal + tax;
+            // Margin
+            const marginAmount = totalCost * (marginPercent / 100);
+            const quotePrice = totalCost + marginAmount;
+            const pricePerSquare = squares > 0 ? quotePrice / squares : 0;
 
             // Update display
-            document.getElementById('materialCost').textContent = materialCost.toFixed(2);
-            document.getElementById('tearoffCost').textContent = tearoffCost.toFixed(2);
-            document.getElementById('addonsCost').textContent = addonsCost.toFixed(2);
-            document.getElementById('subtotal').textContent = (materialCost + tearoffCost + addonsCost).toFixed(2);
-            document.getElementById('steepSurcharge').textContent = steepSurcharge.toFixed(2);
-            document.getElementById('storySurcharge').textContent = storySurcharge.toFixed(2);
-            document.getElementById('warrantyCost').textContent = warrantyCost.toFixed(2);
-            document.getElementById('permitCost').textContent = permitCost.toFixed(2);
-            document.getElementById('discountCost').textContent = discountCost.toFixed(2);
-            document.getElementById('tax').textContent = tax.toFixed(2);
-            document.getElementById('totalQuote').textContent = total.toFixed(2);
+            updateValue('materialCost', materialCost);
+            updateValue('laborCost', laborCost);
+            updateValue('tearoffCost', tearoffCost);
+            updateValue('underlaymentCost', underlaymentCost);
+            updateValue('addonsCost', addonsCost);
+            updateValue('subtotal', subtotal);
+            updateValue('pitchSurcharge', pitchSurcharge);
+            updateValue('totalCost', totalCost);
+            updateValue('marginAmount', marginAmount);
+            updateValue('quotePrice', quotePrice);
+            updateValue('pricePerSquare', pricePerSquare);
 
-            // Update last calculated time
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('lastUpdate').textContent = timeStr;
+            // Store for PDF
+            window.quoteData = {
+                squares,
+                pitch,
+                skylights,
+                redecking,
+                chimney,
+                materialPrice,
+                materialCost,
+                laborCost,
+                tearoffCost,
+                underlaymentCost,
+                addonsCost,
+                subtotal,
+                pitchSurcharge,
+                totalCost,
+                marginPercent,
+                marginAmount,
+                quotePrice,
+                pricePerSquare
+            };
         }
 
-        // Clear form
-        document.getElementById('clearBtn').addEventListener('click', function() {
-            if (confirm('Clear all form data?')) {
-                form.reset();
-                localStorage.removeItem('mrocekQuote');
-                quoteNumber.textContent = generateQuoteNumber();
-                document.getElementById('insuranceCompanyGroup').classList.add('hidden');
-                document.getElementById('materialSection').classList.remove('hidden');
-                calculateQuote();
+        function updateValue(elementId, value) {
+            document.getElementById(elementId).textContent = formatCurrency(value);
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(value);
+        }
+
+        function resetForm() {
+            document.getElementById('clientName').value = '';
+            document.getElementById('clientPhone').value = '';
+            document.getElementById('clientAddress').value = '';
+            document.getElementById('estimateNumber').value = generateEstimateNumber();
+            document.getElementById('squares').value = '0';
+            document.getElementById('pitch').value = '4';
+            document.getElementById('skylights').value = '0';
+            document.getElementById('redecking').value = 'no';
+            document.getElementById('chimney').value = 'no';
+            document.getElementById('marginSlider').value = '35';
+            document.getElementById('marginPercentage').textContent = '35%';
+            document.getElementById('mfg-oc').checked = true;
+            updateProductOptions('oc');
+            calculateAll();
+        }
+
+        function getManufacturerName(product) {
+            return product.startsWith('oc-') ? 'Owens Corning' : 'GAF';
+        }
+
+        function getProductName(product) {
+            const products = {
+                'oc-duration': 'Duration (3-tab)',
+                'oc-designer': 'Duration Designer',
+                'oc-oakridge': 'Oakridge',
+                'oc-trudef': 'TruDefinition Duration',
+                'oc-flex': 'Duration FLEX',
+                'oc-storm': 'Duration STORM',
+                'gaf-royal': 'Royal Sovereign (3-tab)',
+                'gaf-hdz': 'Timberline HDZ',
+                'gaf-hdzrs': 'Timberline HDZ RS+',
+                'gaf-asii': 'Timberline AS II',
+                'gaf-uhdz': 'Timberline UHDZ',
+                'gaf-camelot': 'Camelot II'
+            };
+            return products[product] || 'Unknown';
+        }
+
+        function generatePDF() {
+            if (parseFloat(document.getElementById('squares').value) === 0) {
+                alert('Please enter the number of squares');
+                return;
             }
+
+            const clientName = document.getElementById('clientName').value || '[Client Name]';
+            const clientPhone = document.getElementById('clientPhone').value || '[Phone]';
+            const clientAddress = document.getElementById('clientAddress').value || '[Address]';
+            const estimateNumber = document.getElementById('estimateNumber').value || generateEstimateNumber();
+            const pitch = `${document.getElementById('pitch').value}:12`;
+            const product = document.getElementById('product').value;
+            const productName = getProductName(product);
+            const manufacturer = getManufacturerName(product);
+
+            const data = window.quoteData;
+
+            let html = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #333; }
+                        .container { max-width: 800px; margin: 0 auto; padding: 40px; background: white; }
+                        .header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 3px solid #1a1a1a; }
+                        h1 { font-size: 28px; font-weight: 700; margin-bottom: 5px; }
+                        .header p { color: #666; font-size: 13px; }
+                        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; font-size: 13px; }
+                        .info-item { display: flex; flex-direction: column; }
+                        .info-label { color: #999; font-size: 11px; text-transform: uppercase; margin-bottom: 4px; }
+                        .info-value { font-weight: 500; }
+                        .section { margin-bottom: 30px; }
+                        .section h3 { font-size: 13px; font-weight: 600; text-transform: uppercase; margin-bottom: 10px; background: #f9f9f9; padding: 8px 10px; }
+                        .line { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
+                        .line.subtotal { font-weight: 600; padding-top: 10px; border-top: 2px solid #ddd; border-bottom: none; margin-bottom: 10px; }
+                        .total { font-size: 16px; font-weight: 700; display: flex; justify-content: space-between; padding: 20px 0; border-top: 3px solid #C0392B; margin-top: 20px; }
+                        .total .price { color: #C0392B; font-size: 18px; }
+                        .terms { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 11px; color: #666; line-height: 1.6; }
+                        .terms h4 { font-size: 12px; font-weight: 600; color: #1a1a1a; margin: 12px 0 8px 0; }
+                        .signatures { display: flex; justify-content: space-between; margin-top: 40px; }
+                        .sig-block { width: 45%; font-size: 11px; }
+                        .sig-line { border-top: 1px solid #333; margin-top: 30px; padding-top: 5px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>MROCEK & CO</h1>
+                            <p>Roofing Estimate</p>
+                        </div>
+
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Estimate Number</span>
+                                <span class="info-value">${estimateNumber}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Date</span>
+                                <span class="info-value">${new Date().toLocaleDateString()}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Client Name</span>
+                                <span class="info-value">${clientName}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Phone</span>
+                                <span class="info-value">${clientPhone}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item" style="margin-bottom: 30px;">
+                            <span class="info-label">Property Address</span>
+                            <span class="info-value">${clientAddress}</span>
+                        </div>
+
+                        <div class="section">
+                            <h3>Roof Specifications</h3>
+                            <div class="line">
+                                <span>Roofing Squares</span>
+                                <span>${data.squares.toFixed(1)}</span>
+                            </div>
+                            <div class="line">
+                                <span>Roof Pitch</span>
+                                <span>${pitch}</span>
+                            </div>
+                            <div class="line">
+                                <span>Material: ${manufacturer}</span>
+                                <span>${productName}</span>
+                            </div>
+                            ${data.redecking ? '<div class="line"><span>Redecking</span><span>Yes</span></div>' : ''}
+                            ${data.chimney ? '<div class="line"><span>Chimney Flashing</span><span>Yes</span></div>' : ''}
+                            ${data.skylights > 0 ? '<div class="line"><span>Skylights</span><span>' + data.skylights + '</span></div>' : ''}
+                        </div>
+
+                        <div class="section">
+                            <h3>Line Items</h3>
+                            <div class="line">
+                                <span>Roofing Material</span>
+                                <span>${formatCurrency(data.materialCost)}</span>
+                            </div>
+                            <div class="line">
+                                <span>Labor</span>
+                                <span>${formatCurrency(data.laborCost)}</span>
+                            </div>
+                            <div class="line">
+                                <span>Tear-off and Disposal</span>
+                                <span>${formatCurrency(data.tearoffCost)}</span>
+                            </div>
+                            <div class="line">
+                                <span>Underlayment and Accessories</span>
+                                <span>${formatCurrency(data.underlaymentCost)}</span>
+                            </div>
+                            ${data.addonsCost > 0 ? '<div class="line"><span>Add-ons</span><span>' + formatCurrency(data.addonsCost) + '</span></div>' : ''}
+                            ${data.pitchSurcharge > 0 ? '<div class="line"><span>Pitch Surcharge (' + document.getElementById('pitch').value + ':12)</span><span>' + formatCurrency(data.pitchSurcharge) + '</span></div>' : ''}
+                        </div>
+
+                        <div class="total">
+                            <span>Total Estimate</span>
+                            <span class="price">${formatCurrency(data.quotePrice)}</span>
+                        </div>
+
+                        <div class="terms">
+                            <h4>Terms and Conditions</h4>
+                            <p>This estimate is valid for 30 days from the date above.</p>
+                            <p>A 50% deposit is required to schedule the work. The remaining balance is due upon completion of the project.</p>
+                            <h4>Warranty</h4>
+                            <p>${manufacturer} manufacturer warranty included. Ask us about extended warranty options.</p>
+                        </div>
+
+                        <div class="signatures">
+                            <div class="sig-block">
+                                <div class="sig-line"></div>
+                                <p style="margin-top: 5px;">Authorized Representative</p>
+                            </div>
+                            <div class="sig-block">
+                                <div class="sig-line"></div>
+                                <p style="margin-top: 5px;">Customer Signature</p>
+                            </div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const printWindow = window.open('', '', 'height=900,width=900');
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(value);
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('estimateNumber').value = generateEstimateNumber();
+            setupToggles();
+            updateProductOptions('oc');
+            calculateAll();
         });
-
-        // Generate PDF
-        document.getElementById('pdfBtn').addEventListener('click', function() {
-            // Show terms and signature on print
-            document.getElementById('termsSection').classList.add('show');
-            document.getElementById('signatureLine').classList.add('show');
-
-            // Trigger print dialog
-            setTimeout(() => {
-                window.print();
-                // Hide after print
-                document.getElementById('termsSection').classList.remove('show');
-                document.getElementById('signatureLine').classList.remove('show');
-            }, 100);
-
-            // Show success message
-            const msg = document.getElementById('successMessage');
-            msg.classList.add('show');
-            setTimeout(() => {
-                msg.classList.remove('show');
-            }, 3000);
-        });
-
-        // Initial load
-        loadFromStorage();
-        document.getElementById('insuranceCompanyGroup').classList.add('hidden');
-        calculateQuote();
     </script>
 </body>
 </html>
