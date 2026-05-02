@@ -1235,6 +1235,7 @@
             <div class="button-group">
                 <button class="btn-secondary" onclick="saveQuote()">Save Quote</button>
                 <button class="btn-primary" onclick="downloadPDF()">Download PDF</button>
+                <button class="btn-primary" onclick="generateAgreementPDF()">Generate Agreement</button>
             </div>
         </div>
     </div>
@@ -1354,6 +1355,14 @@
             calculateAll();
         });
 
+        // Add event listeners for gutters details fields
+        document.querySelectorAll('[data-toggle="guttersStories"]').forEach(btn => {
+            btn.addEventListener('click', calculateAll);
+        });
+        document.querySelectorAll('[data-toggle="guttersSize"]').forEach(btn => {
+            btn.addEventListener('click', calculateAll);
+        });
+
         // Close modals on outside click
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', function(e) {
@@ -1367,9 +1376,12 @@
             const squares = parseFloat(document.getElementById('squares').value) || 0;
             const pitch = parseInt(document.getElementById('pitch').value) || 4;
             const skylights = parseInt(document.getElementById('skylights').value) || 0;
-            const redecking = document.getElementById('redecking').value === 'yes' ? 1 : 0;
-            const chimney = document.getElementById('chimney').value === 'yes' ? 1 : 0;
-            const gutters = document.getElementById('gutters').value === 'yes' ? 1 : 0;
+            const redeckingToggle = document.getElementById('redecking').value;
+            const redecking = redeckingToggle === 'yes' ? 1 : 0;
+            const chimneyToggle = document.getElementById('chimney').value;
+            const chimney = chimneyToggle === 'yes' ? 1 : 0;
+            const guttersToggle = document.getElementById('gutters').value;
+            const gutters = guttersToggle === 'yes' ? 1 : 0;
             const guttersLinearFeet = gutters ? (parseFloat(document.getElementById('guttersLinearFeet').value) || 0) : 0;
             const guttersDownspouts = gutters ? (parseInt(document.getElementById('guttersDownspouts').value) || 0) : 0;
             const guttersStories = gutters ? parseInt(document.getElementById('guttersStories').value) : 1;
@@ -1396,8 +1408,8 @@
             const underlaymentCost = (underlayment + accessories + nails + flashing) * squares;
 
             // Add-ons
-            const redeckingCost = redecking * 75 * squares;
-            const chimneyCost = chimney * 450;
+            const redeckingCost = redecking ? (75 * squares) : 0;
+            const chimneyCost = chimney ? 450 : 0;
             const skylightsCost = skylights * 400;
             const addonsCost = redeckingCost + chimneyCost + skylightsCost;
 
@@ -1854,7 +1866,7 @@
             const pageHeight = doc.internal.pageSize.getHeight();
             let yPos = 20;
 
-            // Header
+            // Header with company branding
             doc.setFontSize(24);
             doc.setFont(undefined, 'bold');
             doc.text('MROCEK & CO', pageWidth / 2, yPos, { align: 'center' });
@@ -1862,9 +1874,11 @@
 
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
-            doc.text('Professional Roofing Services', pageWidth / 2, yPos, { align: 'center' });
+            doc.text('ROOFING | CONSTRUCTION | REPAIRS | INSTALLATION', pageWidth / 2, yPos, { align: 'center' });
+            yPos += 5;
+            doc.text('Phone: 724-496-9434', pageWidth / 2, yPos, { align: 'center' });
             yPos += 2;
-            doc.text('Phone: (412) 555-0123 | Address: Pittsburgh, PA', pageWidth / 2, yPos, { align: 'center' });
+            doc.text('Pittsburgh, PA', pageWidth / 2, yPos, { align: 'center' });
             yPos += 10;
 
             // Info grid
@@ -2009,6 +2023,217 @@
 
             doc.save(`Mrocek_Quote_${estimateNumber.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
             showToast('PDF downloaded successfully');
+            saveQuote();
+        }
+
+        function generateAgreementPDF() {
+            if (parseFloat(document.getElementById('squares').value) === 0) {
+                alert('Please enter the number of squares');
+                return;
+            }
+
+            const clientName = document.getElementById('clientName').value || '[Client Name]';
+            const clientPhone = document.getElementById('clientPhone').value || '[Phone]';
+            const clientAddress = document.getElementById('clientAddress').value || '[Address]';
+            const proposedStartDate = document.getElementById('proposedStartDate').value;
+            const estimateNumber = document.getElementById('estimateNumber').value || generateEstimateNumber();
+            const pitch = `${document.getElementById('pitch').value}:12`;
+            const product = document.getElementById('product').value;
+            const productName = getProductName(product);
+            const manufacturer = getManufacturerName(product);
+            const jobNotes = document.getElementById('jobNotes').value;
+
+            const data = window.quoteData;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            let yPos = 20;
+
+            // Header
+            doc.setFontSize(24);
+            doc.setFont(undefined, 'bold');
+            doc.text('MROCEK & CO', pageWidth / 2, yPos, { align: 'center' });
+            yPos += 8;
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text('Professional Roofing Services', pageWidth / 2, yPos, { align: 'center' });
+            yPos += 2;
+            doc.text('Phone: 724-496-9434 | Pittsburgh, PA', pageWidth / 2, yPos, { align: 'center' });
+            yPos += 10;
+
+            // Info grid
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'bold');
+            doc.text(`Estimate #: ${estimateNumber}`, 20, yPos);
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, yPos);
+            yPos += 7;
+
+            doc.setFont(undefined, 'normal');
+            doc.text(`Client: ${clientName}`, 20, yPos);
+            doc.text(`Phone: ${clientPhone}`, pageWidth / 2, yPos);
+            yPos += 7;
+
+            doc.text(`Address: ${clientAddress}`, 20, yPos);
+            yPos += proposedStartDate ? 7 : 10;
+
+            if (proposedStartDate) {
+                doc.text(`Proposed Start: ${new Date(proposedStartDate).toLocaleDateString()}`, 20, yPos);
+                yPos += 10;
+            }
+
+            // Separator
+            doc.setDrawColor(26, 26, 26);
+            doc.line(20, yPos, pageWidth - 20, yPos);
+            yPos += 8;
+
+            // Scope of Work
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(10);
+            doc.text('Scope of Work', 20, yPos);
+            yPos += 6;
+
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(9);
+            const scopeItems = [
+                `Installation of ${data.squares.toFixed(1)} squares of ${manufacturer} ${productName} roofing material`
+            ];
+            if (data.redecking) scopeItems.push('Redecking services as required');
+            if (data.chimney) scopeItems.push('Chimney flashing installation and repair');
+            if (data.skylights > 0) scopeItems.push(`Installation of ${data.skylights} skylight(s)`);
+            if (data.gutters) scopeItems.push(`${data.guttersSize}" gutter system installation with ${data.guttersDownspouts} downspout(s) (${data.guttersStories} story)`);
+            scopeItems.push('Complete tear-off and disposal of existing roofing');
+            scopeItems.push('Underlayment, accessories, and flashing installation');
+
+            scopeItems.forEach(item => {
+                const wrapped = doc.splitTextToSize('- ' + item, pageWidth - 40);
+                wrapped.forEach(line => {
+                    doc.text(line, 25, yPos);
+                    yPos += 4;
+                });
+            });
+
+            yPos += 5;
+
+            // Line items
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(10);
+            doc.text('Materials and Pricing', 20, yPos);
+            yPos += 6;
+
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(9);
+            const items = [
+                ['Roofing Material', formatCurrency(data.materialCost)],
+                ['Labor', formatCurrency(data.laborCost)],
+                ['Tear-off and Disposal', formatCurrency(data.tearoffCost)],
+                ['Underlayment and Accessories', formatCurrency(data.underlaymentCost)]
+            ];
+
+            if (data.addonsCost > 0) items.push(['Add-ons', formatCurrency(data.addonsCost)]);
+            if (data.guttersCost > 0) items.push(['Gutters', formatCurrency(data.guttersCost)]);
+            if (data.pitchSurcharge > 0) items.push(['Pitch Surcharge', formatCurrency(data.pitchSurcharge)]);
+
+            items.forEach(item => {
+                doc.text(item[0], 20, yPos);
+                doc.text(item[1], pageWidth - 20, yPos, { align: 'right' });
+                yPos += 5;
+            });
+
+            yPos += 3;
+            doc.setDrawColor(192, 57, 43);
+            doc.setLineWidth(0.5);
+            doc.line(20, yPos, pageWidth - 20, yPos);
+            yPos += 6;
+
+            // Total
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(11);
+            doc.text('TOTAL PRICE', 20, yPos);
+            doc.setTextColor(192, 57, 43);
+            doc.text(formatCurrency(data.quotePrice), pageWidth - 20, yPos, { align: 'right' });
+            doc.setTextColor(0, 0, 0);
+            yPos += 8;
+
+            // Financing
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(9);
+            const monthlyPayment = calculateMonthlyPayment(data.quotePrice);
+            doc.text(`Estimated Monthly: ${formatCurrency(monthlyPayment)} for 60 months at 9.99% APR`, 20, yPos);
+            yPos += 6;
+            doc.setFontSize(8);
+            doc.text('*Financing subject to credit approval. Rate and terms may vary.', 20, yPos);
+            yPos += 10;
+
+            // Terms and Conditions
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text('Terms and Conditions', 20, yPos);
+            yPos += 6;
+
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(8);
+            const terms = [
+                'Payment Terms: 50% deposit due upon signing this agreement. Balance due upon completion of work.',
+                'Change Orders: Any changes to scope of work will be documented and priced separately.',
+                'Permits: Contractor responsible for obtaining all necessary permits.',
+                'Work Schedule: Work to commence within 2 weeks of deposit, weather permitting.',
+                'Materials: All materials to be new and meet manufacturer specifications.',
+                'Cleanup: Job site will be cleaned daily, all debris removed upon completion.',
+                'Insurance: Contractor maintains general liability and workers compensation insurance.',
+                'Warranty: Manufacturer warranty on materials, 5-year workmanship warranty on labor.',
+                'Cancellation: Customer may cancel within 3 business days of signing per PA law.',
+                'Dispute Resolution: Any disputes to be resolved through arbitration in Allegheny County, PA.',
+                'Property Damage: Contractor responsible for repairing any damage caused during work.',
+                'Lien Waiver: Final lien waiver provided upon receipt of final payment.'
+            ];
+
+            terms.forEach(term => {
+                const wrapped = doc.splitTextToSize(term, pageWidth - 40);
+                wrapped.forEach(line => {
+                    doc.text(line, 20, yPos);
+                    yPos += 4;
+                });
+                yPos += 1;
+            });
+
+            yPos += 5;
+
+            // Signature blocks
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+
+            const sigY = yPos;
+            const signatureLineX1 = 20;
+            const signatureLineX2 = 50;
+            const signatureLineY = sigY + 30;
+            const signatureLineX3 = pageWidth / 2 + 10;
+            const signatureLineX4 = pageWidth - 20;
+
+            doc.line(signatureLineX1, signatureLineY, signatureLineX2, signatureLineY);
+            doc.line(signatureLineX3, signatureLineY, signatureLineX4, signatureLineY);
+
+            yPos = signatureLineY + 5;
+            doc.text('Contractor Signature and Date', signatureLineX1, yPos);
+            doc.text('Customer Signature and Date', signatureLineX3, yPos);
+
+            yPos += 8;
+            doc.setFont(undefined, 'bold');
+            doc.text('Customer Printed Name: _________________________________', 20, yPos);
+
+            yPos += 8;
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(8);
+            const agreementText = 'By signing below, both parties agree to the terms and scope outlined above.';
+            const wrappedAgreement = doc.splitTextToSize(agreementText, pageWidth - 40);
+            wrappedAgreement.forEach(line => {
+                doc.text(line, 20, yPos);
+                yPos += 4;
+            });
+
+            doc.save(`Mrocek_Agreement_${estimateNumber.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
+            showToast('Agreement PDF downloaded successfully');
             saveQuote();
         }
 
