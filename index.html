@@ -1265,6 +1265,23 @@
     </div>
 
     <script>
+        // Load logo as base64 at startup
+        let logoBase64 = null;
+
+        async function loadLogo() {
+            try {
+                const response = await fetch('./logo.png');
+                const blob = await response.blob();
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    logoBase64 = e.target.result;
+                };
+                reader.readAsDataURL(blob);
+            } catch (err) {
+                console.log('Logo not available');
+            }
+        }
+
         // Initialize estimate number on load
         function generateEstimateNumber() {
             const date = new Date();
@@ -1864,79 +1881,116 @@
             const doc = new jsPDF();
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
-            let yPos = 20;
+            const margin = 15;
+            let yPos = 12;
+
+            // Add logo if available
+            if (logoBase64) {
+                try {
+                    doc.addImage(logoBase64, 'PNG', pageWidth / 2 - 18, yPos, 36, 18);
+                    yPos += 22;
+                } catch (e) {
+                    console.log('Error adding logo');
+                }
+            }
 
             // Header with company branding
-            doc.setFontSize(24);
+            doc.setFontSize(20);
             doc.setFont(undefined, 'bold');
             doc.text('MROCEK & CO', pageWidth / 2, yPos, { align: 'center' });
             yPos += 8;
 
-            doc.setFontSize(10);
+            doc.setFontSize(9);
             doc.setFont(undefined, 'normal');
-            doc.text('ROOFING | CONSTRUCTION | REPAIRS | INSTALLATION', pageWidth / 2, yPos, { align: 'center' });
-            yPos += 5;
+            doc.text('Roofing | Construction | Repairs | Installation', pageWidth / 2, yPos, { align: 'center' });
+            yPos += 4;
             doc.text('Phone: 724-496-9434', pageWidth / 2, yPos, { align: 'center' });
-            yPos += 2;
+            yPos += 3;
             doc.text('Pittsburgh, PA', pageWidth / 2, yPos, { align: 'center' });
-            yPos += 10;
+            yPos += 7;
+
+            // Horizontal rule
+            doc.setDrawColor(192, 57, 43);
+            doc.setLineWidth(0.7);
+            doc.line(margin, yPos, pageWidth - margin, yPos);
+            yPos += 8;
 
             // Info grid
             doc.setFontSize(9);
             doc.setFont(undefined, 'bold');
-            doc.text(`Estimate #: ${estimateNumber}`, 20, yPos);
-            doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, yPos);
+            doc.text(`Estimate: ${estimateNumber}`, margin, yPos);
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2 + 10, yPos);
             yPos += 7;
 
             doc.setFont(undefined, 'normal');
-            doc.text(`Client: ${clientName}`, 20, yPos);
-            doc.text(`Phone: ${clientPhone}`, pageWidth / 2, yPos);
-            yPos += 7;
-
-            doc.text(`Address: ${clientAddress}`, 20, yPos);
-            yPos += proposedStartDate ? 7 : 10;
-
-            if (proposedStartDate) {
-                doc.text(`Proposed Start: ${new Date(proposedStartDate).toLocaleDateString()}`, 20, yPos);
-                yPos += 10;
-            }
-
-            // Separator
-            doc.setDrawColor(26, 26, 26);
-            doc.line(20, yPos, pageWidth - 20, yPos);
-            yPos += 8;
-
-            // Roof specs
-            doc.setFont(undefined, 'bold');
-            doc.setFontSize(10);
-            doc.text('Roof Specifications', 20, yPos);
+            doc.text(`Client: ${clientName}`, margin, yPos);
+            doc.text(`Phone: ${clientPhone}`, pageWidth / 2 + 10, yPos);
             yPos += 6;
 
+            doc.text(`Address: ${clientAddress}`, margin, yPos);
+            yPos += 6;
+
+            if (proposedStartDate) {
+                doc.text(`Proposed Start: ${new Date(proposedStartDate).toLocaleDateString()}`, margin, yPos);
+                yPos += 6;
+            }
+
+            yPos += 3;
+
+            // Roof specs section
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(10);
+            doc.text('Roof Specifications', margin, yPos);
+            yPos += 5;
+
             doc.setFont(undefined, 'normal');
-            doc.setFontSize(9);
+            doc.setFontSize(8.5);
             const specs = [
                 [`Squares: ${data.squares.toFixed(1)}`, `Pitch: ${pitch}`],
-                [`Material: ${manufacturer}`, `Product: ${productName}`],
-                [data.redecking ? 'Redecking: Yes' : '', data.chimney ? 'Chimney Flashing: Yes' : ''],
-                [data.skylights > 0 ? `Skylights: ${data.skylights}` : '', data.gutters ? `Gutters: ${data.guttersSize}" (${data.guttersStories} story)` : '']
+                [`Material: ${manufacturer}`, `Product: ${productName}`]
             ];
 
             specs.forEach(row => {
-                if (row[0]) doc.text(row[0], 20, yPos);
-                if (row[1]) doc.text(row[1], pageWidth / 2, yPos);
-                yPos += 5;
+                if (row[0]) doc.text(row[0], margin, yPos);
+                if (row[1]) doc.text(row[1], pageWidth / 2 + 10, yPos);
+                yPos += 4;
             });
+
+            if (data.redecking || data.chimney || data.skylights > 0 || data.gutters) {
+                yPos += 2;
+                const addons = [];
+                if (data.redecking) addons.push('Redecking: Yes');
+                if (data.chimney) addons.push('Chimney Flashing: Yes');
+                if (data.skylights > 0) addons.push(`Skylights: ${data.skylights}`);
+                if (data.gutters) addons.push(`Gutters: ${data.guttersSize}" (${data.guttersStories} story)`);
+
+                addons.forEach(addon => {
+                    doc.text(addon, margin, yPos);
+                    yPos += 4;
+                });
+            }
 
             yPos += 5;
 
-            // Line items
+            // Check if we need a page break
+            const checkPageBreak = (neededSpace) => {
+                if (yPos + neededSpace > pageHeight - 15) {
+                    doc.addPage();
+                    yPos = margin;
+                    return true;
+                }
+                return false;
+            };
+
+            // Line items section
+            checkPageBreak(40);
             doc.setFont(undefined, 'bold');
             doc.setFontSize(10);
-            doc.text('Line Items', 20, yPos);
+            doc.text('Quote Breakdown', margin, yPos);
             yPos += 6;
 
             doc.setFont(undefined, 'normal');
-            doc.setFontSize(9);
+            doc.setFontSize(8.5);
             const items = [
                 ['Roofing Material', formatCurrency(data.materialCost)],
                 ['Labor', formatCurrency(data.laborCost)],
@@ -1949,77 +2003,89 @@
             if (data.pitchSurcharge > 0) items.push(['Pitch Surcharge', formatCurrency(data.pitchSurcharge)]);
 
             items.forEach(item => {
-                doc.text(item[0], 20, yPos);
-                doc.text(item[1], pageWidth - 20, yPos, { align: 'right' });
+                checkPageBreak(5);
+                doc.text(item[0], margin, yPos);
+                doc.text(item[1], pageWidth - margin, yPos, { align: 'right' });
                 yPos += 5;
             });
 
             yPos += 3;
             doc.setDrawColor(192, 57, 43);
             doc.setLineWidth(0.5);
-            doc.line(20, yPos, pageWidth - 20, yPos);
-            yPos += 6;
+            doc.line(margin, yPos, pageWidth - margin, yPos);
+            yPos += 7;
 
             // Total
             doc.setFont(undefined, 'bold');
-            doc.setFontSize(11);
-            doc.text('TOTAL QUOTE', 20, yPos);
+            doc.setFontSize(12);
+            doc.text('TOTAL QUOTE', margin, yPos);
             doc.setTextColor(192, 57, 43);
-            doc.text(formatCurrency(data.quotePrice), pageWidth - 20, yPos, { align: 'right' });
+            doc.setFontSize(11);
+            doc.text(formatCurrency(data.quotePrice), pageWidth - margin, yPos, { align: 'right' });
             doc.setTextColor(0, 0, 0);
-            yPos += 8;
+            yPos += 9;
 
             // Financing
             doc.setFont(undefined, 'normal');
-            doc.setFontSize(9);
-            const monthlyPayment = calculateMonthlyPayment(data.quotePrice);
-            doc.text(`Estimated Monthly: ${formatCurrency(monthlyPayment)} for 60 months at 9.99% APR`, 20, yPos);
-            yPos += 6;
             doc.setFontSize(8);
-            doc.text('*Financing subject to credit approval. Rate and terms may vary.', 20, yPos);
-            yPos += 8;
+            const monthlyPayment = calculateMonthlyPayment(data.quotePrice);
+            const financeText = `Estimated Monthly: ${formatCurrency(monthlyPayment)} for 60 months at 9.99% APR`;
+            doc.text(financeText, margin, yPos);
+            yPos += 4;
+            doc.setTextColor(150, 150, 150);
+            doc.text('*Financing subject to credit approval. Rate and terms may vary.', margin, yPos);
+            doc.setTextColor(0, 0, 0);
+            yPos += 7;
 
             // Notes
             if (jobNotes) {
+                checkPageBreak(20);
                 doc.setFontSize(9);
                 doc.setFont(undefined, 'bold');
-                doc.text('Job Notes', 20, yPos);
+                doc.text('Job Notes', margin, yPos);
                 yPos += 5;
                 doc.setFont(undefined, 'normal');
                 doc.setFontSize(8);
-                const noteLines = doc.splitTextToSize(jobNotes, pageWidth - 40);
+                const noteLines = doc.splitTextToSize(jobNotes, pageWidth - (margin * 2));
                 noteLines.forEach(line => {
-                    doc.text(line, 20, yPos);
+                    checkPageBreak(5);
+                    doc.text(line, margin, yPos);
                     yPos += 4;
                 });
                 yPos += 5;
             }
 
             // Terms
-            yPos += 3;
+            checkPageBreak(20);
+            yPos += 2;
             doc.setFontSize(8);
             doc.setFont(undefined, 'bold');
-            doc.text('Terms and Conditions', 20, yPos);
+            doc.text('Terms and Conditions', margin, yPos);
             yPos += 4;
 
             doc.setFont(undefined, 'normal');
             const terms = 'This estimate is valid for 30 days. A 50% deposit is required to schedule work. Balance due upon completion. Includes manufacturer warranty.';
-            const termLines = doc.splitTextToSize(terms, pageWidth - 40);
+            const termLines = doc.splitTextToSize(terms, pageWidth - (margin * 2));
             termLines.forEach(line => {
-                doc.text(line, 20, yPos);
+                checkPageBreak(5);
+                doc.text(line, margin, yPos);
                 yPos += 4;
             });
 
             yPos += 8;
 
             // Signatures
+            checkPageBreak(15);
             doc.setFont(undefined, 'normal');
             doc.setFontSize(8);
-            doc.line(20, yPos, 50, yPos);
-            doc.line(pageWidth - 50, yPos, pageWidth - 20, yPos);
-            yPos += 5;
-            doc.text('Authorized Representative', 20, yPos);
-            doc.text('Customer Signature', pageWidth - 50, yPos, { align: 'right' });
+            const sigLineY = yPos + 20;
+            doc.line(margin, sigLineY, margin + 30, sigLineY);
+            doc.line(pageWidth - margin - 30, sigLineY, pageWidth - margin, sigLineY);
+
+            yPos = sigLineY + 4;
+            doc.setFontSize(7);
+            doc.text('Authorized Representative', margin, yPos);
+            doc.text('Customer Signature', pageWidth - margin - 30, yPos, { align: 'right' });
 
             doc.save(`Mrocek_Quote_${estimateNumber.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
             showToast('PDF downloaded successfully');
@@ -2048,54 +2114,77 @@
             const doc = new jsPDF();
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
-            let yPos = 20;
+            const margin = 15;
+            let yPos = 12;
+
+            // Add logo if available
+            if (logoBase64) {
+                try {
+                    doc.addImage(logoBase64, 'PNG', pageWidth / 2 - 18, yPos, 36, 18);
+                    yPos += 22;
+                } catch (e) {
+                    console.log('Error adding logo');
+                }
+            }
 
             // Header
-            doc.setFontSize(24);
+            doc.setFontSize(20);
             doc.setFont(undefined, 'bold');
             doc.text('MROCEK & CO', pageWidth / 2, yPos, { align: 'center' });
             yPos += 8;
 
-            doc.setFontSize(10);
+            doc.setFontSize(9);
             doc.setFont(undefined, 'normal');
             doc.text('Professional Roofing Services', pageWidth / 2, yPos, { align: 'center' });
-            yPos += 2;
+            yPos += 3;
             doc.text('Phone: 724-496-9434 | Pittsburgh, PA', pageWidth / 2, yPos, { align: 'center' });
-            yPos += 10;
+            yPos += 7;
+
+            // Horizontal rule
+            doc.setDrawColor(192, 57, 43);
+            doc.setLineWidth(0.7);
+            doc.line(margin, yPos, pageWidth - margin, yPos);
+            yPos += 8;
 
             // Info grid
             doc.setFontSize(9);
             doc.setFont(undefined, 'bold');
-            doc.text(`Estimate #: ${estimateNumber}`, 20, yPos);
-            doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, yPos);
-            yPos += 7;
-
-            doc.setFont(undefined, 'normal');
-            doc.text(`Client: ${clientName}`, 20, yPos);
-            doc.text(`Phone: ${clientPhone}`, pageWidth / 2, yPos);
-            yPos += 7;
-
-            doc.text(`Address: ${clientAddress}`, 20, yPos);
-            yPos += proposedStartDate ? 7 : 10;
-
-            if (proposedStartDate) {
-                doc.text(`Proposed Start: ${new Date(proposedStartDate).toLocaleDateString()}`, 20, yPos);
-                yPos += 10;
-            }
-
-            // Separator
-            doc.setDrawColor(26, 26, 26);
-            doc.line(20, yPos, pageWidth - 20, yPos);
-            yPos += 8;
-
-            // Scope of Work
-            doc.setFont(undefined, 'bold');
-            doc.setFontSize(10);
-            doc.text('Scope of Work', 20, yPos);
+            doc.text(`Estimate: ${estimateNumber}`, margin, yPos);
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2 + 10, yPos);
             yPos += 6;
 
             doc.setFont(undefined, 'normal');
-            doc.setFontSize(9);
+            doc.text(`Client: ${clientName}`, margin, yPos);
+            doc.text(`Phone: ${clientPhone}`, pageWidth / 2 + 10, yPos);
+            yPos += 6;
+
+            doc.text(`Address: ${clientAddress}`, margin, yPos);
+            yPos += 6;
+
+            if (proposedStartDate) {
+                doc.text(`Proposed Start: ${new Date(proposedStartDate).toLocaleDateString()}`, margin, yPos);
+                yPos += 6;
+            }
+
+            yPos += 3;
+
+            // Scope of Work
+            const checkPageBreak = (neededSpace) => {
+                if (yPos + neededSpace > pageHeight - 15) {
+                    doc.addPage();
+                    yPos = margin;
+                    return true;
+                }
+                return false;
+            };
+
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(10);
+            doc.text('Scope of Work', margin, yPos);
+            yPos += 5;
+
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(8.5);
             const scopeItems = [
                 `Installation of ${data.squares.toFixed(1)} squares of ${manufacturer} ${productName} roofing material`
             ];
@@ -2107,23 +2196,25 @@
             scopeItems.push('Underlayment, accessories, and flashing installation');
 
             scopeItems.forEach(item => {
-                const wrapped = doc.splitTextToSize('- ' + item, pageWidth - 40);
+                const wrapped = doc.splitTextToSize('- ' + item, pageWidth - (margin * 2 + 5));
                 wrapped.forEach(line => {
-                    doc.text(line, 25, yPos);
+                    checkPageBreak(4);
+                    doc.text(line, margin + 5, yPos);
                     yPos += 4;
                 });
             });
 
             yPos += 5;
 
-            // Line items
+            // Materials and Pricing
+            checkPageBreak(30);
             doc.setFont(undefined, 'bold');
             doc.setFontSize(10);
-            doc.text('Materials and Pricing', 20, yPos);
-            yPos += 6;
+            doc.text('Materials and Pricing', margin, yPos);
+            yPos += 5;
 
             doc.setFont(undefined, 'normal');
-            doc.setFontSize(9);
+            doc.setFontSize(8.5);
             const items = [
                 ['Roofing Material', formatCurrency(data.materialCost)],
                 ['Labor', formatCurrency(data.laborCost)],
@@ -2136,100 +2227,103 @@
             if (data.pitchSurcharge > 0) items.push(['Pitch Surcharge', formatCurrency(data.pitchSurcharge)]);
 
             items.forEach(item => {
-                doc.text(item[0], 20, yPos);
-                doc.text(item[1], pageWidth - 20, yPos, { align: 'right' });
+                checkPageBreak(5);
+                doc.text(item[0], margin, yPos);
+                doc.text(item[1], pageWidth - margin, yPos, { align: 'right' });
                 yPos += 5;
             });
 
-            yPos += 3;
+            yPos += 2;
             doc.setDrawColor(192, 57, 43);
             doc.setLineWidth(0.5);
-            doc.line(20, yPos, pageWidth - 20, yPos);
+            doc.line(margin, yPos, pageWidth - margin, yPos);
             yPos += 6;
 
             // Total
             doc.setFont(undefined, 'bold');
             doc.setFontSize(11);
-            doc.text('TOTAL PRICE', 20, yPos);
+            doc.text('TOTAL PRICE', margin, yPos);
             doc.setTextColor(192, 57, 43);
-            doc.text(formatCurrency(data.quotePrice), pageWidth - 20, yPos, { align: 'right' });
+            doc.text(formatCurrency(data.quotePrice), pageWidth - margin, yPos, { align: 'right' });
             doc.setTextColor(0, 0, 0);
             yPos += 8;
 
             // Financing
             doc.setFont(undefined, 'normal');
-            doc.setFontSize(9);
-            const monthlyPayment = calculateMonthlyPayment(data.quotePrice);
-            doc.text(`Estimated Monthly: ${formatCurrency(monthlyPayment)} for 60 months at 9.99% APR`, 20, yPos);
-            yPos += 6;
             doc.setFontSize(8);
-            doc.text('*Financing subject to credit approval. Rate and terms may vary.', 20, yPos);
-            yPos += 10;
+            const monthlyPayment = calculateMonthlyPayment(data.quotePrice);
+            const financeText = `Estimated Monthly: ${formatCurrency(monthlyPayment)} for 60 months at 9.99% APR`;
+            doc.text(financeText, margin, yPos);
+            yPos += 4;
+            doc.setTextColor(150, 150, 150);
+            doc.text('*Financing subject to credit approval. Rate and terms may vary.', margin, yPos);
+            doc.setTextColor(0, 0, 0);
+            yPos += 7;
 
             // Terms and Conditions
+            checkPageBreak(30);
+            yPos += 2;
             doc.setFontSize(10);
             doc.setFont(undefined, 'bold');
-            doc.text('Terms and Conditions', 20, yPos);
-            yPos += 6;
+            doc.text('Terms and Conditions', margin, yPos);
+            yPos += 5;
 
             doc.setFont(undefined, 'normal');
-            doc.setFontSize(8);
+            doc.setFontSize(7.5);
             const terms = [
-                'Payment Terms: 50% deposit due upon signing this agreement. Balance due upon completion of work.',
-                'Change Orders: Any changes to scope of work will be documented and priced separately.',
-                'Permits: Contractor responsible for obtaining all necessary permits.',
-                'Work Schedule: Work to commence within 2 weeks of deposit, weather permitting.',
-                'Materials: All materials to be new and meet manufacturer specifications.',
-                'Cleanup: Job site will be cleaned daily, all debris removed upon completion.',
-                'Insurance: Contractor maintains general liability and workers compensation insurance.',
-                'Warranty: Manufacturer warranty on materials, 5-year workmanship warranty on labor.',
-                'Cancellation: Customer may cancel within 3 business days of signing per PA law.',
-                'Dispute Resolution: Any disputes to be resolved through arbitration in Allegheny County, PA.',
-                'Property Damage: Contractor responsible for repairing any damage caused during work.',
-                'Lien Waiver: Final lien waiver provided upon receipt of final payment.'
+                'Payment Terms: 50% deposit due upon signing. Balance due upon completion.',
+                'Change Orders: Any scope changes documented and priced separately.',
+                'Permits: Contractor obtains all necessary permits.',
+                'Work Schedule: Work to commence within 2 weeks, weather permitting.',
+                'Materials: All materials new and per manufacturer specifications.',
+                'Cleanup: Daily cleanup, all debris removed upon completion.',
+                'Insurance: Contractor maintains general liability and workers comp insurance.',
+                'Warranty: Manufacturer warranty on materials, 5-year warranty on labor.',
+                'Cancellation: Customer may cancel within 3 days per PA law.',
+                'Disputes: Resolved through arbitration in Allegheny County, PA.',
+                'Property Damage: Contractor responsible for repairs if needed.',
+                'Lien Waiver: Final lien waiver upon receipt of final payment.'
             ];
 
             terms.forEach(term => {
-                const wrapped = doc.splitTextToSize(term, pageWidth - 40);
+                checkPageBreak(4);
+                const wrapped = doc.splitTextToSize(term, pageWidth - (margin * 2));
                 wrapped.forEach(line => {
-                    doc.text(line, 20, yPos);
-                    yPos += 4;
+                    checkPageBreak(4);
+                    doc.text(line, margin, yPos);
+                    yPos += 3.5;
                 });
-                yPos += 1;
             });
 
-            yPos += 5;
+            yPos += 8;
 
             // Signature blocks
-            doc.setFontSize(9);
-            doc.setFont(undefined, 'normal');
-
-            const sigY = yPos;
-            const signatureLineX1 = 20;
-            const signatureLineX2 = 50;
-            const signatureLineY = sigY + 30;
-            const signatureLineX3 = pageWidth / 2 + 10;
-            const signatureLineX4 = pageWidth - 20;
-
-            doc.line(signatureLineX1, signatureLineY, signatureLineX2, signatureLineY);
-            doc.line(signatureLineX3, signatureLineY, signatureLineX4, signatureLineY);
-
-            yPos = signatureLineY + 5;
-            doc.text('Contractor Signature and Date', signatureLineX1, yPos);
-            doc.text('Customer Signature and Date', signatureLineX3, yPos);
-
-            yPos += 8;
-            doc.setFont(undefined, 'bold');
-            doc.text('Customer Printed Name: _________________________________', 20, yPos);
-
-            yPos += 8;
-            doc.setFont(undefined, 'normal');
+            checkPageBreak(20);
             doc.setFontSize(8);
+            doc.setFont(undefined, 'normal');
+
+            const signatureLineY = yPos + 20;
+            doc.line(margin, signatureLineY, margin + 30, signatureLineY);
+            doc.line(pageWidth - margin - 30, signatureLineY, pageWidth - margin, signatureLineY);
+
+            yPos = signatureLineY + 3;
+            doc.setFontSize(7.5);
+            doc.text('Contractor Signature and Date', margin, yPos);
+            doc.text('Customer Signature and Date', pageWidth - margin - 30, yPos, { align: 'right' });
+
+            yPos += 10;
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(8);
+            doc.text('Customer Printed Name: ________________________', margin, yPos);
+
+            yPos += 8;
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(7.5);
             const agreementText = 'By signing below, both parties agree to the terms and scope outlined above.';
-            const wrappedAgreement = doc.splitTextToSize(agreementText, pageWidth - 40);
+            const wrappedAgreement = doc.splitTextToSize(agreementText, pageWidth - (margin * 2));
             wrappedAgreement.forEach(line => {
-                doc.text(line, 20, yPos);
-                yPos += 4;
+                doc.text(line, margin, yPos);
+                yPos += 3.5;
             });
 
             doc.save(`Mrocek_Agreement_${estimateNumber.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
@@ -2253,6 +2347,7 @@
 
         // Initialize on load
         document.addEventListener('DOMContentLoaded', function() {
+            loadLogo();
             setupToggles();
             updateProductOptions('oc');
 
