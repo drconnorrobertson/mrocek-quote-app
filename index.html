@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mrocek & Co - Roofing Quote Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -562,11 +563,441 @@
                 display: none !important;
             }
         }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s;
+            width: 90%;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        /* Quote history styles */
+        .quote-history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            background: #f9f9f9;
+            border-color: #C0392B;
+        }
+
+        .history-info {
+            flex: 1;
+        }
+
+        .history-est {
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .history-details {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .history-amount {
+            font-weight: 600;
+            color: #C0392B;
+            margin: 0 20px;
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            padding: 8px 12px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-delete {
+            background: #ffe0e0;
+            color: #C0392B;
+        }
+
+        .btn-delete:hover {
+            background: #ffc0c0;
+        }
+
+        /* Comparison styles */
+        .comparison-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .comparison-card {
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .comparison-card.selected {
+            border-color: #C0392B;
+            background: #fff8f7;
+        }
+
+        .comparison-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1a1a1a;
+        }
+
+        .comparison-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #C0392B;
+            margin: 15px 0;
+        }
+
+        .comparison-features {
+            font-size: 12px;
+            color: #666;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .price-difference {
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Photo upload styles */
+        .photo-section {
+            border-top: 2px solid #f0f0f0;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .photo-input-area {
+            border: 2px dashed #ddd;
+            border-radius: 4px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f9f9f9;
+        }
+
+        .photo-input-area:hover {
+            border-color: #C0392B;
+            background: #fff8f7;
+        }
+
+        .photo-input-area label {
+            cursor: pointer;
+            margin: 0;
+            text-transform: none;
+            letter-spacing: normal;
+            color: #C0392B;
+            font-weight: 600;
+        }
+
+        #photoInput {
+            display: none;
+        }
+
+        .photo-gallery {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .photo-thumb {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        .photo-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-thumb .remove-photo {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #C0392B;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        /* Toast styles */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1a1a1a;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            animation: slideInUp 0.3s;
+            z-index: 2000;
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Financing section */
+        .financing-section {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            border-left: 4px solid #C0392B;
+        }
+
+        .financing-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .financing-line .label {
+            color: #666;
+        }
+
+        .financing-line .price {
+            font-weight: 600;
+            color: #C0392B;
+        }
+
+        .financing-disclaimer {
+            font-size: 10px;
+            color: #999;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        /* Notes field */
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #C0392B;
+            box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.1);
+        }
+
+        /* Start date field */
+        input[type="date"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        input[type="date"]:focus {
+            outline: none;
+            border-color: #C0392B;
+            box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.1);
+        }
+
+        /* Header action buttons */
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .btn-header {
+            flex: 1;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .btn-header.secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-header.secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-header.primary {
+            background: #C0392B;
+            color: white;
+        }
+
+        .btn-header.primary:hover {
+            background: #a02e23;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .comparison-container {
+                grid-template-columns: 1fr;
+            }
+
+            .header-actions {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
     <header>
         <h1>MROCEK & CO</h1>
+        <div class="header-actions">
+            <button class="btn-header secondary" onclick="openQuoteHistory()">Quote History</button>
+            <button class="btn-header secondary" onclick="openComparison()">Compare Options</button>
+        </div>
     </header>
 
     <div class="container">
@@ -589,6 +1020,10 @@
                 <div class="form-group">
                     <label>Estimate Number</label>
                     <input type="text" id="estimateNumber" placeholder="Auto-generated">
+                </div>
+                <div class="form-group">
+                    <label>Proposed Start Date</label>
+                    <input type="date" id="proposedStartDate">
                 </div>
             </div>
 
@@ -700,6 +1135,25 @@
                     </select>
                 </div>
             </div>
+
+            <!-- Job Notes Section -->
+            <div class="form-section">
+                <h2>Job Notes</h2>
+                <div class="form-group">
+                    <label>Job Notes</label>
+                    <textarea id="jobNotes" placeholder="Damage observations, special conditions, access notes..."></textarea>
+                </div>
+            </div>
+
+            <!-- Photo Upload Section -->
+            <div class="form-section photo-section">
+                <h2>Add Photos</h2>
+                <div class="photo-input-area" onclick="document.getElementById('photoInput').click()">
+                    <label>Click to add photos or tap camera (Max 5)</label>
+                    <input type="file" id="photoInput" accept="image/*" multiple>
+                </div>
+                <div class="photo-gallery" id="photoGallery"></div>
+            </div>
         </div>
 
         <!-- Sidebar Calculations -->
@@ -770,10 +1224,42 @@
                 <div class="value" id="pricePerSquare">$0.00</div>
             </div>
 
-            <div class="button-group">
-                <button class="btn-secondary" onclick="resetForm()">Reset</button>
-                <button class="btn-primary" onclick="generatePDF()">Generate Quote</button>
+            <div class="financing-section">
+                <div class="financing-line">
+                    <span class="label">Estimated Monthly Payment</span>
+                    <span class="price" id="monthlyPayment">$0/mo</span>
+                </div>
+                <div class="financing-disclaimer">As low as $0/mo for 60 months. *Financing subject to credit approval. Rate and terms may vary.</div>
             </div>
+
+            <div class="button-group">
+                <button class="btn-secondary" onclick="saveQuote()">Save Quote</button>
+                <button class="btn-primary" onclick="downloadPDF()">Download PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quote History Modal -->
+    <div id="quoteHistoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Quote History</h2>
+                <button class="close-btn" onclick="closeModal('quoteHistoryModal')">&times;</button>
+            </div>
+            <div class="quote-history-list" id="quoteHistoryList">
+                <p style="color: #999;">No saved quotes yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparison Modal -->
+    <div id="comparisonModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Material Comparison: Good, Better, Best</h2>
+                <button class="close-btn" onclick="closeModal('comparisonModal')">&times;</button>
+            </div>
+            <div id="comparisonContent"></div>
         </div>
     </div>
 
@@ -858,9 +1344,23 @@
         document.getElementById('guttersLinearFeet').addEventListener('input', calculateAll);
         document.getElementById('guttersDownspouts').addEventListener('input', calculateAll);
         document.getElementById('product').addEventListener('change', calculateAll);
+        document.getElementById('jobNotes').addEventListener('input', autoSave);
+        document.getElementById('proposedStartDate').addEventListener('change', autoSave);
+        document.getElementById('clientName').addEventListener('input', autoSave);
+        document.getElementById('clientPhone').addEventListener('input', autoSave);
+        document.getElementById('clientAddress').addEventListener('input', autoSave);
         document.getElementById('marginSlider').addEventListener('input', function() {
             document.getElementById('marginPercentage').textContent = this.value + '%';
             calculateAll();
+        });
+
+        // Close modals on outside click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('show');
+                }
+            });
         });
 
         function calculateAll() {
@@ -956,6 +1456,12 @@
             updateValue('quotePrice', quotePrice);
             updateValue('pricePerSquare', pricePerSquare);
 
+            // Calculate monthly payment
+            const monthlyPayment = calculateMonthlyPayment(quotePrice);
+
+            // Update financing display
+            document.getElementById('monthlyPayment').textContent = formatCurrency(monthlyPayment) + '/mo';
+
             // Store for PDF
             window.quoteData = {
                 squares,
@@ -981,8 +1487,11 @@
                 marginPercent,
                 marginAmount,
                 quotePrice,
-                pricePerSquare
+                pricePerSquare,
+                monthlyPayment
             };
+
+            autoSave();
         }
 
         function updateValue(elementId, value) {
@@ -1000,6 +1509,7 @@
             document.getElementById('clientName').value = '';
             document.getElementById('clientPhone').value = '';
             document.getElementById('clientAddress').value = '';
+            document.getElementById('proposedStartDate').value = '';
             document.getElementById('estimateNumber').value = generateEstimateNumber();
             document.getElementById('squares').value = '0';
             document.getElementById('pitch').value = '4';
@@ -1014,6 +1524,9 @@
             document.getElementById('guttersDetails').style.display = 'none';
             document.getElementById('marginSlider').value = '35';
             document.getElementById('marginPercentage').textContent = '35%';
+            document.getElementById('jobNotes').value = '';
+            document.getElementById('photoGallery').innerHTML = '';
+            window.photos = [];
             document.getElementById('mfg-oc').checked = true;
 
             // Reset toggle button styles
@@ -1050,7 +1563,274 @@
             return products[product] || 'Unknown';
         }
 
-        function generatePDF() {
+        // Photo management
+        window.photos = [];
+        const maxPhotos = 5;
+
+        document.getElementById('photoInput').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            const remainingSlots = maxPhotos - window.photos.length;
+            const filesToAdd = files.slice(0, remainingSlots);
+
+            filesToAdd.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    window.photos.push(event.target.result);
+                    renderPhotos();
+                    autoSave();
+                };
+                reader.readAsDataURL(file);
+            });
+
+            this.value = '';
+        });
+
+        function renderPhotos() {
+            const gallery = document.getElementById('photoGallery');
+            gallery.innerHTML = '';
+
+            window.photos.forEach((photo, index) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'photo-thumb';
+                thumb.innerHTML = `
+                    <img src="${photo}" alt="Photo ${index + 1}">
+                    <button class="remove-photo" onclick="removePhoto(${index})" title="Delete">&times;</button>
+                `;
+                gallery.appendChild(thumb);
+            });
+        }
+
+        function removePhoto(index) {
+            window.photos.splice(index, 1);
+            renderPhotos();
+            autoSave();
+        }
+
+        // Auto-save quote
+        function autoSave() {
+            const quoteData = {
+                clientName: document.getElementById('clientName').value,
+                clientPhone: document.getElementById('clientPhone').value,
+                clientAddress: document.getElementById('clientAddress').value,
+                proposedStartDate: document.getElementById('proposedStartDate').value,
+                estimateNumber: document.getElementById('estimateNumber').value,
+                squares: document.getElementById('squares').value,
+                pitch: document.getElementById('pitch').value,
+                skylights: document.getElementById('skylights').value,
+                redecking: document.getElementById('redecking').value,
+                chimney: document.getElementById('chimney').value,
+                gutters: document.getElementById('gutters').value,
+                guttersLinearFeet: document.getElementById('guttersLinearFeet').value,
+                guttersDownspouts: document.getElementById('guttersDownspouts').value,
+                guttersStories: document.getElementById('guttersStories').value,
+                guttersSize: document.getElementById('guttersSize').value,
+                manufacturer: document.querySelector('input[name="manufacturer"]:checked').value,
+                product: document.getElementById('product').value,
+                marginSlider: document.getElementById('marginSlider').value,
+                jobNotes: document.getElementById('jobNotes').value,
+                photos: window.photos,
+                timestamp: new Date().toISOString()
+            };
+
+            sessionStorage.setItem('currentQuote', JSON.stringify(quoteData));
+        }
+
+        function saveQuote() {
+            const estimateNumber = document.getElementById('estimateNumber').value;
+            if (!estimateNumber) {
+                showToast('Please ensure an estimate number is generated');
+                return;
+            }
+
+            const quoteData = {
+                clientName: document.getElementById('clientName').value,
+                clientPhone: document.getElementById('clientPhone').value,
+                clientAddress: document.getElementById('clientAddress').value,
+                proposedStartDate: document.getElementById('proposedStartDate').value,
+                estimateNumber: estimateNumber,
+                squares: document.getElementById('squares').value,
+                pitch: document.getElementById('pitch').value,
+                skylights: document.getElementById('skylights').value,
+                redecking: document.getElementById('redecking').value,
+                chimney: document.getElementById('chimney').value,
+                gutters: document.getElementById('gutters').value,
+                guttersLinearFeet: document.getElementById('guttersLinearFeet').value,
+                guttersDownspouts: document.getElementById('guttersDownspouts').value,
+                guttersStories: document.getElementById('guttersStories').value,
+                guttersSize: document.getElementById('guttersSize').value,
+                manufacturer: document.querySelector('input[name="manufacturer"]:checked').value,
+                product: document.getElementById('product').value,
+                marginSlider: document.getElementById('marginSlider').value,
+                jobNotes: document.getElementById('jobNotes').value,
+                photos: window.photos,
+                timestamp: new Date().toISOString()
+            };
+
+            let history = JSON.parse(localStorage.getItem('quoteHistory') || '[]');
+            const existingIndex = history.findIndex(q => q.estimateNumber === estimateNumber);
+            if (existingIndex >= 0) {
+                history[existingIndex] = quoteData;
+            } else {
+                history.push(quoteData);
+            }
+            localStorage.setItem('quoteHistory', JSON.stringify(history));
+            showToast('Quote saved successfully');
+        }
+
+        function loadQuote(estimateNumber) {
+            const history = JSON.parse(localStorage.getItem('quoteHistory') || '[]');
+            const quote = history.find(q => q.estimateNumber === estimateNumber);
+            if (!quote) return;
+
+            document.getElementById('clientName').value = quote.clientName;
+            document.getElementById('clientPhone').value = quote.clientPhone;
+            document.getElementById('clientAddress').value = quote.clientAddress;
+            document.getElementById('proposedStartDate').value = quote.proposedStartDate || '';
+            document.getElementById('estimateNumber').value = quote.estimateNumber;
+            document.getElementById('squares').value = quote.squares;
+            document.getElementById('pitch').value = quote.pitch;
+            document.getElementById('skylights').value = quote.skylights;
+            document.getElementById('redecking').value = quote.redecking;
+            document.getElementById('chimney').value = quote.chimney;
+            document.getElementById('gutters').value = quote.gutters;
+            document.getElementById('guttersLinearFeet').value = quote.guttersLinearFeet;
+            document.getElementById('guttersDownspouts').value = quote.guttersDownspouts;
+            document.getElementById('guttersStories').value = quote.guttersStories;
+            document.getElementById('guttersSize').value = quote.guttersSize;
+            document.getElementById('marginSlider').value = quote.marginSlider;
+            document.getElementById('marginPercentage').textContent = quote.marginSlider + '%';
+            document.getElementById('jobNotes').value = quote.jobNotes;
+            window.photos = quote.photos || [];
+
+            document.querySelectorAll('input[name="manufacturer"]').forEach(r => {
+                r.checked = r.value === quote.manufacturer;
+            });
+
+            updateProductOptions(quote.manufacturer);
+            document.getElementById('product').value = quote.product;
+
+            const guttersDetails = document.getElementById('guttersDetails');
+            guttersDetails.style.display = quote.gutters === 'yes' ? 'block' : 'none';
+
+            // Update toggle buttons
+            ['redecking', 'chimney', 'gutters'].forEach(toggleName => {
+                document.querySelectorAll(`[data-toggle="${toggleName}"]`).forEach(b => {
+                    b.classList.remove('active');
+                });
+                const value = document.getElementById(toggleName).value;
+                document.querySelector(`[data-toggle="${toggleName}"][data-value="${value}"]`).classList.add('active');
+            });
+
+            document.querySelectorAll('[data-toggle="guttersStories"]').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-toggle="guttersStories"][data-value="${quote.guttersStories}"]`).classList.add('active');
+
+            document.querySelectorAll('[data-toggle="guttersSize"]').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-toggle="guttersSize"][data-value="${quote.guttersSize}"]`).classList.add('active');
+
+            renderPhotos();
+            calculateAll();
+            closeModal('quoteHistoryModal');
+            showToast('Quote loaded');
+        }
+
+        function deleteQuote(estimateNumber) {
+            if (!confirm('Are you sure you want to delete this quote?')) return;
+            let history = JSON.parse(localStorage.getItem('quoteHistory') || '[]');
+            history = history.filter(q => q.estimateNumber !== estimateNumber);
+            localStorage.setItem('quoteHistory', JSON.stringify(history));
+            populateQuoteHistory();
+            showToast('Quote deleted');
+        }
+
+        function openQuoteHistory() {
+            populateQuoteHistory();
+            openModal('quoteHistoryModal');
+        }
+
+        function populateQuoteHistory() {
+            const history = JSON.parse(localStorage.getItem('quoteHistory') || '[]');
+            const list = document.getElementById('quoteHistoryList');
+
+            if (history.length === 0) {
+                list.innerHTML = '<p style="color: #999;">No saved quotes yet.</p>';
+                return;
+            }
+
+            list.innerHTML = history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).map(quote => `
+                <div class="history-item" onclick="loadQuote('${quote.estimateNumber}')">
+                    <div class="history-info">
+                        <div class="history-est">${quote.estimateNumber}</div>
+                        <div class="history-details">${quote.clientName || 'No client'} - ${new Date(quote.timestamp).toLocaleDateString()}</div>
+                    </div>
+                    <div class="history-amount">${formatCurrency(window.quoteData?.quotePrice || 0)}</div>
+                    <div class="history-actions">
+                        <button class="btn-icon" onclick="loadQuote('${quote.estimateNumber}'); event.stopPropagation();">Load</button>
+                        <button class="btn-icon btn-delete" onclick="deleteQuote('${quote.estimateNumber}'); event.stopPropagation();">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openComparison() {
+            const manufacturer = document.querySelector('input[name="manufacturer"]:checked').value;
+            const products = {
+                oc: [
+                    { label: 'Duration (3-tab)', price: 85 },
+                    { label: 'TruDefinition Duration', price: 100 },
+                    { label: 'Duration STORM', price: 115 }
+                ],
+                gaf: [
+                    { label: 'Royal Sovereign (3-tab)', price: 80 },
+                    { label: 'Timberline HDZ', price: 100 },
+                    { label: 'Camelot II', price: 150 }
+                ]
+            };
+
+            const tiers = products[manufacturer];
+            const currentProduct = document.getElementById('product').value;
+            const squares = parseFloat(document.getElementById('squares').value) || 1;
+
+            const comparison = tiers.map((tier, idx) => {
+                const tierPrice = tier.price * squares;
+                const currentTierPrice = tiers[1].price * squares;
+                const diff = tierPrice - currentTierPrice;
+                const label = idx === 0 ? 'Good' : idx === 1 ? 'Better' : 'Best';
+                const selected = idx === 1 ? 'selected' : '';
+
+                return `
+                    <div class="comparison-card ${selected}">
+                        <h3>${label}</h3>
+                        <div>${tier.label}</div>
+                        <div class="comparison-price">${formatCurrency(tierPrice)}</div>
+                        ${diff !== 0 ? `<div class="price-difference">${diff > 0 ? '+' : ''}${formatCurrency(diff)}</div>` : '<div class="price-difference">Current selection</div>'}
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('comparisonContent').innerHTML = `
+                <p style="margin-bottom: 20px; color: #666;">Showing material pricing for ${squares} squares at current pitch.</p>
+                <div class="comparison-container">${comparison}</div>
+            `;
+            openModal('comparisonModal');
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function downloadPDF() {
             if (parseFloat(document.getElementById('squares').value) === 0) {
                 alert('Please enter the number of squares');
                 return;
@@ -1059,148 +1839,184 @@
             const clientName = document.getElementById('clientName').value || '[Client Name]';
             const clientPhone = document.getElementById('clientPhone').value || '[Phone]';
             const clientAddress = document.getElementById('clientAddress').value || '[Address]';
+            const proposedStartDate = document.getElementById('proposedStartDate').value;
             const estimateNumber = document.getElementById('estimateNumber').value || generateEstimateNumber();
             const pitch = `${document.getElementById('pitch').value}:12`;
             const product = document.getElementById('product').value;
             const productName = getProductName(product);
             const manufacturer = getManufacturerName(product);
+            const jobNotes = document.getElementById('jobNotes').value;
 
             const data = window.quoteData;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            let yPos = 20;
 
-            let html = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <style>
-                        * { margin: 0; padding: 0; box-sizing: border-box; }
-                        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #333; }
-                        .container { max-width: 800px; margin: 0 auto; padding: 40px; background: white; }
-                        .header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 3px solid #1a1a1a; }
-                        h1 { font-size: 28px; font-weight: 700; margin-bottom: 5px; }
-                        .header p { color: #666; font-size: 13px; }
-                        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; font-size: 13px; }
-                        .info-item { display: flex; flex-direction: column; }
-                        .info-label { color: #999; font-size: 11px; text-transform: uppercase; margin-bottom: 4px; }
-                        .info-value { font-weight: 500; }
-                        .section { margin-bottom: 30px; }
-                        .section h3 { font-size: 13px; font-weight: 600; text-transform: uppercase; margin-bottom: 10px; background: #f9f9f9; padding: 8px 10px; }
-                        .line { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
-                        .line.subtotal { font-weight: 600; padding-top: 10px; border-top: 2px solid #ddd; border-bottom: none; margin-bottom: 10px; }
-                        .total { font-size: 16px; font-weight: 700; display: flex; justify-content: space-between; padding: 20px 0; border-top: 3px solid #C0392B; margin-top: 20px; }
-                        .total .price { color: #C0392B; font-size: 18px; }
-                        .terms { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 11px; color: #666; line-height: 1.6; }
-                        .terms h4 { font-size: 12px; font-weight: 600; color: #1a1a1a; margin: 12px 0 8px 0; }
-                        .signatures { display: flex; justify-content: space-between; margin-top: 40px; }
-                        .sig-block { width: 45%; font-size: 11px; }
-                        .sig-line { border-top: 1px solid #333; margin-top: 30px; padding-top: 5px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <h1>MROCEK & CO</h1>
-                            <p>Roofing Estimate</p>
-                        </div>
+            // Header
+            doc.setFontSize(24);
+            doc.setFont(undefined, 'bold');
+            doc.text('MROCEK & CO', pageWidth / 2, yPos, { align: 'center' });
+            yPos += 8;
 
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <span class="info-label">Estimate Number</span>
-                                <span class="info-value">${estimateNumber}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Date</span>
-                                <span class="info-value">${new Date().toLocaleDateString()}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Client Name</span>
-                                <span class="info-value">${clientName}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Phone</span>
-                                <span class="info-value">${clientPhone}</span>
-                            </div>
-                        </div>
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text('Professional Roofing Services', pageWidth / 2, yPos, { align: 'center' });
+            yPos += 2;
+            doc.text('Phone: (412) 555-0123 | Address: Pittsburgh, PA', pageWidth / 2, yPos, { align: 'center' });
+            yPos += 10;
 
-                        <div class="info-item" style="margin-bottom: 30px;">
-                            <span class="info-label">Property Address</span>
-                            <span class="info-value">${clientAddress}</span>
-                        </div>
+            // Info grid
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'bold');
+            doc.text(`Estimate #: ${estimateNumber}`, 20, yPos);
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, yPos);
+            yPos += 7;
 
-                        <div class="section">
-                            <h3>Roof Specifications</h3>
-                            <div class="line">
-                                <span>Roofing Squares</span>
-                                <span>${data.squares.toFixed(1)}</span>
-                            </div>
-                            <div class="line">
-                                <span>Roof Pitch</span>
-                                <span>${pitch}</span>
-                            </div>
-                            <div class="line">
-                                <span>Material: ${manufacturer}</span>
-                                <span>${productName}</span>
-                            </div>
-                            ${data.redecking ? '<div class="line"><span>Redecking</span><span>Yes</span></div>' : ''}
-                            ${data.chimney ? '<div class="line"><span>Chimney Flashing</span><span>Yes</span></div>' : ''}
-                            ${data.skylights > 0 ? '<div class="line"><span>Skylights</span><span>' + data.skylights + '</span></div>' : ''}
-                            ${data.gutters ? '<div class="line"><span>Gutters (' + data.guttersSize + ' inch, ' + data.guttersStories + ' story)</span><span>' + data.guttersLinearFeet + ' ft, ' + data.guttersDownspouts + ' spouts</span></div>' : ''}
-                        </div>
+            doc.setFont(undefined, 'normal');
+            doc.text(`Client: ${clientName}`, 20, yPos);
+            doc.text(`Phone: ${clientPhone}`, pageWidth / 2, yPos);
+            yPos += 7;
 
-                        <div class="section">
-                            <h3>Line Items</h3>
-                            <div class="line">
-                                <span>Roofing Material</span>
-                                <span>${formatCurrency(data.materialCost)}</span>
-                            </div>
-                            <div class="line">
-                                <span>Labor</span>
-                                <span>${formatCurrency(data.laborCost)}</span>
-                            </div>
-                            <div class="line">
-                                <span>Tear-off and Disposal</span>
-                                <span>${formatCurrency(data.tearoffCost)}</span>
-                            </div>
-                            <div class="line">
-                                <span>Underlayment and Accessories</span>
-                                <span>${formatCurrency(data.underlaymentCost)}</span>
-                            </div>
-                            ${data.addonsCost > 0 ? '<div class="line"><span>Add-ons</span><span>' + formatCurrency(data.addonsCost) + '</span></div>' : ''}
-                            ${data.guttersCost > 0 ? '<div class="line"><span>Gutters</span><span>' + formatCurrency(data.guttersCost) + '</span></div>' : ''}
-                            ${data.pitchSurcharge > 0 ? '<div class="line"><span>Pitch Surcharge (' + document.getElementById('pitch').value + ':12)</span><span>' + formatCurrency(data.pitchSurcharge) + '</span></div>' : ''}
-                        </div>
+            doc.text(`Address: ${clientAddress}`, 20, yPos);
+            yPos += proposedStartDate ? 7 : 10;
 
-                        <div class="total">
-                            <span>Total Estimate</span>
-                            <span class="price">${formatCurrency(data.quotePrice)}</span>
-                        </div>
+            if (proposedStartDate) {
+                doc.text(`Proposed Start: ${new Date(proposedStartDate).toLocaleDateString()}`, 20, yPos);
+                yPos += 10;
+            }
 
-                        <div class="terms">
-                            <h4>Terms and Conditions</h4>
-                            <p>This estimate is valid for 30 days from the date above.</p>
-                            <p>A 50% deposit is required to schedule the work. The remaining balance is due upon completion of the project.</p>
-                            <h4>Warranty</h4>
-                            <p>${manufacturer} manufacturer warranty included. Ask us about extended warranty options.</p>
-                        </div>
+            // Separator
+            doc.setDrawColor(26, 26, 26);
+            doc.line(20, yPos, pageWidth - 20, yPos);
+            yPos += 8;
 
-                        <div class="signatures">
-                            <div class="sig-block">
-                                <div class="sig-line"></div>
-                                <p style="margin-top: 5px;">Authorized Representative</p>
-                            </div>
-                            <div class="sig-block">
-                                <div class="sig-line"></div>
-                                <p style="margin-top: 5px;">Customer Signature</p>
-                            </div>
-                        </div>
-                    </div>
-                </body>
-                </html>
-            `;
+            // Roof specs
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(10);
+            doc.text('Roof Specifications', 20, yPos);
+            yPos += 6;
 
-            const printWindow = window.open('', '', 'height=900,width=900');
-            printWindow.document.write(html);
-            printWindow.document.close();
-            printWindow.print();
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(9);
+            const specs = [
+                [`Squares: ${data.squares.toFixed(1)}`, `Pitch: ${pitch}`],
+                [`Material: ${manufacturer}`, `Product: ${productName}`],
+                [data.redecking ? 'Redecking: Yes' : '', data.chimney ? 'Chimney Flashing: Yes' : ''],
+                [data.skylights > 0 ? `Skylights: ${data.skylights}` : '', data.gutters ? `Gutters: ${data.guttersSize}" (${data.guttersStories} story)` : '']
+            ];
+
+            specs.forEach(row => {
+                if (row[0]) doc.text(row[0], 20, yPos);
+                if (row[1]) doc.text(row[1], pageWidth / 2, yPos);
+                yPos += 5;
+            });
+
+            yPos += 5;
+
+            // Line items
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(10);
+            doc.text('Line Items', 20, yPos);
+            yPos += 6;
+
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(9);
+            const items = [
+                ['Roofing Material', formatCurrency(data.materialCost)],
+                ['Labor', formatCurrency(data.laborCost)],
+                ['Tear-off and Disposal', formatCurrency(data.tearoffCost)],
+                ['Underlayment and Accessories', formatCurrency(data.underlaymentCost)]
+            ];
+
+            if (data.addonsCost > 0) items.push(['Add-ons', formatCurrency(data.addonsCost)]);
+            if (data.guttersCost > 0) items.push(['Gutters', formatCurrency(data.guttersCost)]);
+            if (data.pitchSurcharge > 0) items.push(['Pitch Surcharge', formatCurrency(data.pitchSurcharge)]);
+
+            items.forEach(item => {
+                doc.text(item[0], 20, yPos);
+                doc.text(item[1], pageWidth - 20, yPos, { align: 'right' });
+                yPos += 5;
+            });
+
+            yPos += 3;
+            doc.setDrawColor(192, 57, 43);
+            doc.setLineWidth(0.5);
+            doc.line(20, yPos, pageWidth - 20, yPos);
+            yPos += 6;
+
+            // Total
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(11);
+            doc.text('TOTAL QUOTE', 20, yPos);
+            doc.setTextColor(192, 57, 43);
+            doc.text(formatCurrency(data.quotePrice), pageWidth - 20, yPos, { align: 'right' });
+            doc.setTextColor(0, 0, 0);
+            yPos += 8;
+
+            // Financing
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(9);
+            const monthlyPayment = calculateMonthlyPayment(data.quotePrice);
+            doc.text(`Estimated Monthly: ${formatCurrency(monthlyPayment)} for 60 months at 9.99% APR`, 20, yPos);
+            yPos += 6;
+            doc.setFontSize(8);
+            doc.text('*Financing subject to credit approval. Rate and terms may vary.', 20, yPos);
+            yPos += 8;
+
+            // Notes
+            if (jobNotes) {
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'bold');
+                doc.text('Job Notes', 20, yPos);
+                yPos += 5;
+                doc.setFont(undefined, 'normal');
+                doc.setFontSize(8);
+                const noteLines = doc.splitTextToSize(jobNotes, pageWidth - 40);
+                noteLines.forEach(line => {
+                    doc.text(line, 20, yPos);
+                    yPos += 4;
+                });
+                yPos += 5;
+            }
+
+            // Terms
+            yPos += 3;
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'bold');
+            doc.text('Terms and Conditions', 20, yPos);
+            yPos += 4;
+
+            doc.setFont(undefined, 'normal');
+            const terms = 'This estimate is valid for 30 days. A 50% deposit is required to schedule work. Balance due upon completion. Includes manufacturer warranty.';
+            const termLines = doc.splitTextToSize(terms, pageWidth - 40);
+            termLines.forEach(line => {
+                doc.text(line, 20, yPos);
+                yPos += 4;
+            });
+
+            yPos += 8;
+
+            // Signatures
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(8);
+            doc.line(20, yPos, 50, yPos);
+            doc.line(pageWidth - 50, yPos, pageWidth - 20, yPos);
+            yPos += 5;
+            doc.text('Authorized Representative', 20, yPos);
+            doc.text('Customer Signature', pageWidth - 50, yPos, { align: 'right' });
+
+            doc.save(`Mrocek_Quote_${estimateNumber.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
+            showToast('PDF downloaded successfully');
+            saveQuote();
+        }
+
+        function calculateMonthlyPayment(principal) {
+            const monthlyRate = 0.0999 / 12;
+            const numPayments = 60;
+            const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
+            return payment;
         }
 
         function formatCurrency(value) {
@@ -1212,9 +2028,47 @@
 
         // Initialize on load
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('estimateNumber').value = generateEstimateNumber();
             setupToggles();
             updateProductOptions('oc');
+
+            // Try to restore from session
+            const saved = sessionStorage.getItem('currentQuote');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('clientName').value = data.clientName;
+                document.getElementById('clientPhone').value = data.clientPhone;
+                document.getElementById('clientAddress').value = data.clientAddress;
+                document.getElementById('proposedStartDate').value = data.proposedStartDate || '';
+                document.getElementById('estimateNumber').value = data.estimateNumber;
+                document.getElementById('squares').value = data.squares;
+                document.getElementById('pitch').value = data.pitch;
+                document.getElementById('skylights').value = data.skylights;
+                document.getElementById('redecking').value = data.redecking;
+                document.getElementById('chimney').value = data.chimney;
+                document.getElementById('gutters').value = data.gutters;
+                document.getElementById('guttersLinearFeet').value = data.guttersLinearFeet;
+                document.getElementById('guttersDownspouts').value = data.guttersDownspouts;
+                document.getElementById('guttersStories').value = data.guttersStories;
+                document.getElementById('guttersSize').value = data.guttersSize;
+                document.getElementById('marginSlider').value = data.marginSlider;
+                document.getElementById('marginPercentage').textContent = data.marginSlider + '%';
+                document.getElementById('jobNotes').value = data.jobNotes;
+                window.photos = data.photos || [];
+                renderPhotos();
+
+                document.querySelectorAll('input[name="manufacturer"]').forEach(r => {
+                    r.checked = r.value === data.manufacturer;
+                });
+
+                updateProductOptions(data.manufacturer);
+                document.getElementById('product').value = data.product;
+
+                const guttersDetails = document.getElementById('guttersDetails');
+                guttersDetails.style.display = data.gutters === 'yes' ? 'block' : 'none';
+            } else {
+                document.getElementById('estimateNumber').value = generateEstimateNumber();
+            }
+
             calculateAll();
         });
     </script>
