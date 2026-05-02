@@ -1037,15 +1037,12 @@
                 <div class="form-group">
                     <label>Pitch</label>
                     <select id="pitch">
-                        <option value="4">4:12</option>
-                        <option value="5">5:12</option>
-                        <option value="6">6:12</option>
-                        <option value="7">7:12</option>
-                        <option value="8">8:12</option>
-                        <option value="9">9:12</option>
-                        <option value="10">10:12</option>
-                        <option value="11">11:12</option>
-                        <option value="12">12:12</option>
+                        <option value="1-6">1/12 - 6/12 (Walk-on)</option>
+                        <option value="7-8">7/12 - 8/12</option>
+                        <option value="9">9/12</option>
+                        <option value="10-11">10/12 - 11/12</option>
+                        <option value="12">12/12</option>
+                        <option value="14-18">14/12 - 18/12+</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1108,31 +1105,49 @@
 
             <!-- Product Selection Section -->
             <div class="form-section">
-                <h2>Product Selection</h2>
+                <h2>Material Selection</h2>
                 <div class="form-group">
-                    <label>Manufacturer</label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="mfg-oc" name="manufacturer" value="oc" checked>
-                            <label for="mfg-oc">Owens Corning</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="mfg-gaf" name="manufacturer" value="gaf">
-                            <label for="mfg-gaf">GAF</label>
-                        </div>
-                    </div>
+                    <label>Material</label>
+                    <select id="product">
+                        <option value="oc-trudef" data-price="215">OC Duration TruDefinition (Standard) - $215/sq</option>
+                        <option value="oc-flex" data-price="220">OC Duration FLEX - $220/sq</option>
+                        <option value="oc-storm" data-price="230">OC Duration STORM - $230/sq</option>
+                        <option value="oc-oakridge" data-price="195">OC Oakridge - $195/sq</option>
+                        <option value="oc-designer" data-price="225">OC Duration Designer - $225/sq</option>
+                        <option value="gaf-hdz" data-price="200">GAF Timberline HDZ - $200/sq</option>
+                        <option value="metal-rpanel" data-price="120">R-Panel Metal - $120/sq</option>
+                        <option value="metal-ss" data-price="450">Metal (Standing Seam) - $450/sq</option>
+                        <option value="slate" data-price="600">Slate (New) - $600/sq</option>
+                        <option value="tpo" data-price="300">TPO / Flat - $300/sq</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label>Product</label>
-                    <select id="product">
-                        <!-- OC products (default) -->
-                        <option value="oc-duration" data-price="85">Duration (3-tab economy) - $85/sq</option>
-                        <option value="oc-designer" data-price="110">Duration Designer - $110/sq</option>
-                        <option value="oc-oakridge" data-price="95">Oakridge - $95/sq</option>
-                        <option value="oc-trudef" data-price="100">TruDefinition Duration - $100/sq</option>
-                        <option value="oc-flex" data-price="105">Duration FLEX - $105/sq</option>
-                        <option value="oc-storm" data-price="115">Duration STORM - $115/sq</option>
+                    <label>Crew</label>
+                    <select id="crew">
+                        <option value="greg">Greg</option>
+                        <option value="dulin">Dulin</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label>Material Cost Override (optional)</label>
+                    <input type="number" id="materialCostOverride" placeholder="Leave blank to use preset" min="0" step="1">
+                </div>
+                <div class="form-group">
+                    <label>Dump Cost</label>
+                    <input type="number" id="dumpCost" placeholder="$500" value="500" min="0" step="1">
+                </div>
+                <div class="form-group">
+                    <label>Rubber/Accessories</label>
+                    <input type="number" id="rubberAccessories" placeholder="$0" value="0" min="0" step="1">
+                </div>
+                <div class="form-group">
+                    <label>Duddy Split</label>
+                    <div class="toggle-group">
+                        <button type="button" class="toggle-btn active" data-toggle="duddySplit" data-value="no">No</button>
+                        <button type="button" class="toggle-btn" data-toggle="duddySplit" data-value="yes">Yes</button>
+                    </div>
+                    <input type="hidden" id="duddySplit" value="no">
+                    <div id="duddySplitLabel" style="font-size: 12px; color: #999; margin-top: 6px; display: none;">60% Duddy / 40% Derek</div>
                 </div>
             </div>
 
@@ -1158,23 +1173,23 @@
 
         <!-- Sidebar Calculations -->
         <div class="sidebar">
-            <h3>Quote Breakdown</h3>
+            <h3>Internal Breakdown</h3>
 
+            <div class="calc-row">
+                <label>Sub Cost (at pitch)</label>
+                <div class="value" id="subCost">$0.00</div>
+            </div>
             <div class="calc-row">
                 <label>Material Cost</label>
                 <div class="value" id="materialCost">$0.00</div>
             </div>
             <div class="calc-row">
-                <label>Labor (150/sq)</label>
-                <div class="value" id="laborCost">$0.00</div>
+                <label>Dump Cost</label>
+                <div class="value" id="dumpCostDisplay">$0.00</div>
             </div>
             <div class="calc-row">
-                <label>Tear-off & Dump</label>
-                <div class="value" id="tearoffCost">$0.00</div>
-            </div>
-            <div class="calc-row">
-                <label>Underlayment & Accessories</label>
-                <div class="value" id="underlaymentCost">$0.00</div>
+                <label>Accessories</label>
+                <div class="value" id="accessoriesCostDisplay">$0.00</div>
             </div>
             <div class="calc-row">
                 <label>Add-ons Total</label>
@@ -1184,23 +1199,25 @@
                 <label>Gutters Total</label>
                 <div class="value" id="guttersCost">$0.00</div>
             </div>
-            <div class="calc-row">
-                <label>Subtotal (before surcharge)</label>
-                <div class="value" id="subtotal">$0.00</div>
-            </div>
-            <div class="calc-row">
-                <label>Pitch Surcharge</label>
-                <div class="value" id="pitchSurcharge">$0.00</div>
-            </div>
             <div class="calc-row total">
                 <label>COST TO MROCEK</label>
                 <div class="value" id="totalCost">$0.00</div>
             </div>
 
+            <div class="calc-row" style="margin-top: 8px;">
+                <label>Crew</label>
+                <div class="value" id="crewDisplay">Greg</div>
+            </div>
+
+            <div class="calc-row" style="margin-top: 8px;">
+                <label>Duddy Split</label>
+                <div class="value" id="duddySplitDisplay">Off</div>
+            </div>
+
             <div class="margin-section">
                 <h4>Margin Settings</h4>
                 <div class="margin-display">
-                    <span class="label">Markup Percentage</span>
+                    <span class="label">Margin Percentage</span>
                     <span class="percentage" id="marginPercentage">35%</span>
                 </div>
                 <div class="margin-slider-container">
@@ -1315,45 +1332,12 @@
             });
         }
 
-        // Manufacturer and product selection
-        document.querySelectorAll('input[name="manufacturer"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                updateProductOptions(this.value);
-                calculateAll();
-            });
-        });
-
-        function updateProductOptions(manufacturer) {
-            const productSelect = document.getElementById('product');
-            productSelect.innerHTML = '';
-
-            const products = {
-                oc: [
-                    { value: 'oc-duration', label: 'Duration (3-tab economy) - $85/sq', price: 85 },
-                    { value: 'oc-designer', label: 'Duration Designer - $110/sq', price: 110 },
-                    { value: 'oc-oakridge', label: 'Oakridge - $95/sq', price: 95 },
-                    { value: 'oc-trudef', label: 'TruDefinition Duration - $100/sq', price: 100 },
-                    { value: 'oc-flex', label: 'Duration FLEX - $105/sq', price: 105 },
-                    { value: 'oc-storm', label: 'Duration STORM - $115/sq', price: 115 }
-                ],
-                gaf: [
-                    { value: 'gaf-royal', label: 'Royal Sovereign (3-tab) - $80/sq', price: 80 },
-                    { value: 'gaf-hdz', label: 'Timberline HDZ - $100/sq', price: 100 },
-                    { value: 'gaf-hdzrs', label: 'Timberline HDZ RS+ - $110/sq', price: 110 },
-                    { value: 'gaf-asii', label: 'Timberline AS II - $120/sq', price: 120 },
-                    { value: 'gaf-uhdz', label: 'Timberline UHDZ - $130/sq', price: 130 },
-                    { value: 'gaf-camelot', label: 'Camelot II - $150/sq', price: 150 }
-                ]
-            };
-
-            products[manufacturer].forEach(product => {
-                const option = document.createElement('option');
-                option.value = product.value;
-                option.textContent = product.label;
-                option.setAttribute('data-price', product.price);
-                productSelect.appendChild(option);
-            });
-        }
+        // Product selection
+        document.getElementById('product').addEventListener('change', calculateAll);
+        document.getElementById('crew').addEventListener('change', calculateAll);
+        document.getElementById('materialCostOverride').addEventListener('input', calculateAll);
+        document.getElementById('dumpCost').addEventListener('input', calculateAll);
+        document.getElementById('rubberAccessories').addEventListener('input', calculateAll);
 
         // Event listeners for calculations
         document.getElementById('squares').addEventListener('input', calculateAll);
@@ -1361,7 +1345,6 @@
         document.getElementById('skylights').addEventListener('input', calculateAll);
         document.getElementById('guttersLinearFeet').addEventListener('input', calculateAll);
         document.getElementById('guttersDownspouts').addEventListener('input', calculateAll);
-        document.getElementById('product').addEventListener('change', calculateAll);
         document.getElementById('jobNotes').addEventListener('input', autoSave);
         document.getElementById('proposedStartDate').addEventListener('change', autoSave);
         document.getElementById('clientName').addEventListener('input', autoSave);
@@ -1370,6 +1353,20 @@
         document.getElementById('marginSlider').addEventListener('input', function() {
             document.getElementById('marginPercentage').textContent = this.value + '%';
             calculateAll();
+        });
+
+        // Duddy split toggle
+        document.querySelectorAll('[data-toggle="duddySplit"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                document.getElementById('duddySplit').value = value;
+                document.querySelectorAll('[data-toggle="duddySplit"]').forEach(b => {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+                document.getElementById('duddySplitLabel').style.display = value === 'yes' ? 'block' : 'none';
+                calculateAll();
+            });
         });
 
         // Add event listeners for gutters details fields
@@ -1389,9 +1386,36 @@
             });
         });
 
+        function getPitchRange(pitchValue) {
+            const pitchMap = {
+                '1-6': { label: '1/12 - 6/12', customerRate: 450 },
+                '7-8': { label: '7/12 - 8/12', customerRate: 475 },
+                '9': { label: '9/12', customerRate: 500 },
+                '10-11': { label: '10/12 - 11/12', customerRate: 550 },
+                '12': { label: '12/12', customerRate: 625 },
+                '14-18': { label: '14/12 - 18/12+', customerRate: 700 }
+            };
+            return pitchMap[pitchValue] || pitchMap['1-6'];
+        }
+
+        function getSubCost(pitchValue, crew) {
+            const subRates = {
+                '1-6': { greg: 110, dulin: 130 },
+                '7-8': { greg: 120, dulin: 130 },
+                '9': { greg: 130, dulin: 140 },
+                '10-11': { greg: 150, dulin: 150 },
+                '12': { greg: 180, dulin: 170 },
+                '14-18': { greg: 250, dulin: 200 }
+            };
+            const rates = subRates[pitchValue] || subRates['1-6'];
+            return rates[crew] || rates.greg;
+        }
+
         function calculateAll() {
             const squares = parseFloat(document.getElementById('squares').value) || 0;
-            const pitch = parseInt(document.getElementById('pitch').value) || 4;
+            const pitchValue = document.getElementById('pitch').value;
+            const pitch = getPitchRange(pitchValue);
+            const crew = document.getElementById('crew').value;
             const skylights = parseInt(document.getElementById('skylights').value) || 0;
             const redeckingToggle = document.getElementById('redecking').value;
             const redecking = redeckingToggle === 'yes' ? 1 : 0;
@@ -1404,25 +1428,22 @@
             const guttersStories = gutters ? parseInt(document.getElementById('guttersStories').value) : 1;
             const guttersSize = gutters ? parseInt(document.getElementById('guttersSize').value) : 5;
             const marginPercent = parseInt(document.getElementById('marginSlider').value) || 35;
+            const dumpCost = parseFloat(document.getElementById('dumpCost').value) || 500;
+            const rubberAccessories = parseFloat(document.getElementById('rubberAccessories').value) || 0;
+            const duddySplit = document.getElementById('duddySplit').value === 'yes';
 
-            // Get material price
+            // Get material price (use override if provided)
             const productSelect = document.getElementById('product');
-            const materialPrice = parseFloat(productSelect.options[productSelect.selectedIndex].getAttribute('data-price')) || 0;
+            const presetPrice = parseFloat(productSelect.options[productSelect.selectedIndex].getAttribute('data-price')) || 0;
+            const overridePrice = parseFloat(document.getElementById('materialCostOverride').value);
+            const materialPrice = overridePrice || presetPrice;
 
-            // Base costs per square
-            const labor = 150;
-            const tearoff = 75;
-            const dump = 30;
-            const underlayment = 45;
-            const accessories = 20;
-            const nails = 10;
-            const flashing = 15;
+            // Sub cost per square
+            const subCostPerSquare = getSubCost(pitchValue, crew);
+            const subCost = subCostPerSquare * squares;
 
-            // Calculate costs
-            const materialCost = materialPrice * squares;
-            const laborCost = labor * squares;
-            const tearoffCost = (tearoff + dump) * squares;
-            const underlaymentCost = (underlayment + accessories + nails + flashing) * squares;
+            // Material cost
+            const materialCostValue = materialPrice * squares;
 
             // Add-ons
             const redeckingCost = redecking ? (75 * squares) : 0;
@@ -1433,67 +1454,55 @@
             // Gutters
             let guttersCost = 0;
             if (gutters) {
-                // Determine gutter price per linear foot based on size and stories
                 let gutterPricePerFt = 0;
                 if (guttersSize === 5) {
                     gutterPricePerFt = guttersStories === 1 ? 8 : 10;
                 } else if (guttersSize === 6) {
                     gutterPricePerFt = guttersStories === 1 ? 10 : 13;
                 }
-
-                // Determine downspout price based on stories
                 const downspoutPrice = guttersStories === 1 ? 75 : 100;
-
-                // Calculate costs
                 const gutterLineCost = guttersLinearFeet * gutterPricePerFt;
                 const downspoutsCost = guttersDownspouts * downspoutPrice;
                 guttersCost = gutterLineCost + downspoutsCost;
             }
 
-            // Subtotal
-            const subtotal = materialCost + laborCost + tearoffCost + underlaymentCost + addonsCost + guttersCost;
+            // Total cost to Mrocek (internal, not customer-facing)
+            const totalCostToMrocek = subCost + materialCostValue + dumpCost + rubberAccessories + addonsCost + guttersCost;
 
-            // Pitch surcharge
-            let pitchSurcharge = 0;
-            if (pitch >= 7 && pitch <= 8) {
-                pitchSurcharge = subtotal * 0.10;
-            } else if (pitch >= 9 && pitch <= 10) {
-                pitchSurcharge = subtotal * 0.20;
-            } else if (pitch >= 11 && pitch <= 12) {
-                pitchSurcharge = subtotal * 0.30;
-            }
+            // Customer-facing price calculation
+            // Customer price = cost / (1 - margin%)
+            const marginDecimal = marginPercent / 100;
+            const quotePrice = totalCostToMrocek / (1 - marginDecimal);
 
-            // Total cost to Mrocek
-            const totalCost = subtotal + pitchSurcharge;
+            // Margin amounts
+            const marginAmount = quotePrice - totalCostToMrocek;
 
-            // Margin
-            const marginAmount = totalCost * (marginPercent / 100);
-            const quotePrice = totalCost + marginAmount;
             const pricePerSquare = squares > 0 ? quotePrice / squares : 0;
 
             // Update display
-            updateValue('materialCost', materialCost);
-            updateValue('laborCost', laborCost);
-            updateValue('tearoffCost', tearoffCost);
-            updateValue('underlaymentCost', underlaymentCost);
+            updateValue('subCost', subCost);
+            updateValue('materialCost', materialCostValue);
+            updateValue('dumpCostDisplay', dumpCost);
+            updateValue('accessoriesCostDisplay', rubberAccessories);
             updateValue('addonsCost', addonsCost);
             updateValue('guttersCost', guttersCost);
-            updateValue('subtotal', subtotal);
-            updateValue('pitchSurcharge', pitchSurcharge);
-            updateValue('totalCost', totalCost);
+            updateValue('totalCost', totalCostToMrocek);
             updateValue('marginAmount', marginAmount);
             updateValue('quotePrice', quotePrice);
             updateValue('pricePerSquare', pricePerSquare);
 
+            // Update crew and duddy split display
+            document.getElementById('crewDisplay').textContent = crew.charAt(0).toUpperCase() + crew.slice(1);
+            document.getElementById('duddySplitDisplay').textContent = duddySplit ? 'On (60% Duddy / 40% Derek)' : 'Off';
+
             // Calculate monthly payment
             const monthlyPayment = calculateMonthlyPayment(quotePrice);
-
-            // Update financing display
             document.getElementById('monthlyPayment').textContent = formatCurrency(monthlyPayment) + '/mo';
 
             // Store for PDF
             window.quoteData = {
                 squares,
+                pitchValue,
                 pitch,
                 skylights,
                 redecking,
@@ -1504,15 +1513,15 @@
                 guttersStories,
                 guttersSize,
                 guttersCost,
+                crew,
+                duddySplit,
                 materialPrice,
-                materialCost,
-                laborCost,
-                tearoffCost,
-                underlaymentCost,
+                materialCostValue,
+                dumpCost,
+                rubberAccessories,
                 addonsCost,
-                subtotal,
-                pitchSurcharge,
-                totalCost,
+                subCost,
+                totalCostToMrocek,
                 marginPercent,
                 marginAmount,
                 quotePrice,
@@ -1541,7 +1550,7 @@
             document.getElementById('proposedStartDate').value = '';
             document.getElementById('estimateNumber').value = generateEstimateNumber();
             document.getElementById('squares').value = '0';
-            document.getElementById('pitch').value = '4';
+            document.getElementById('pitch').value = '7-8';
             document.getElementById('skylights').value = '0';
             document.getElementById('redecking').value = 'no';
             document.getElementById('chimney').value = 'no';
@@ -1555,8 +1564,13 @@
             document.getElementById('marginPercentage').textContent = '35%';
             document.getElementById('jobNotes').value = '';
             document.getElementById('photoGallery').innerHTML = '';
+            document.getElementById('crew').value = 'greg';
+            document.getElementById('dumpCost').value = '500';
+            document.getElementById('materialCostOverride').value = '';
+            document.getElementById('rubberAccessories').value = '0';
+            document.getElementById('duddySplit').value = 'no';
+            document.getElementById('duddySplitLabel').style.display = 'none';
             window.photos = [];
-            document.getElementById('mfg-oc').checked = true;
 
             // Reset toggle button styles
             document.querySelectorAll('[data-toggle="gutters"]').forEach(b => b.classList.remove('active'));
@@ -1565,29 +1579,25 @@
             document.querySelector('[data-toggle="guttersStories"][data-value="1"]').classList.add('active');
             document.querySelectorAll('[data-toggle="guttersSize"]').forEach(b => b.classList.remove('active'));
             document.querySelector('[data-toggle="guttersSize"][data-value="5"]').classList.add('active');
+            document.querySelectorAll('[data-toggle="duddySplit"]').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-toggle="duddySplit"][data-value="no"]').classList.add('active');
 
-            updateProductOptions('oc');
+            document.getElementById('product').value = 'oc-trudef';
             calculateAll();
-        }
-
-        function getManufacturerName(product) {
-            return product.startsWith('oc-') ? 'Owens Corning' : 'GAF';
         }
 
         function getProductName(product) {
             const products = {
-                'oc-duration': 'Duration (3-tab)',
-                'oc-designer': 'Duration Designer',
-                'oc-oakridge': 'Oakridge',
-                'oc-trudef': 'TruDefinition Duration',
-                'oc-flex': 'Duration FLEX',
-                'oc-storm': 'Duration STORM',
-                'gaf-royal': 'Royal Sovereign (3-tab)',
-                'gaf-hdz': 'Timberline HDZ',
-                'gaf-hdzrs': 'Timberline HDZ RS+',
-                'gaf-asii': 'Timberline AS II',
-                'gaf-uhdz': 'Timberline UHDZ',
-                'gaf-camelot': 'Camelot II'
+                'oc-trudef': 'OC Duration TruDefinition (Standard)',
+                'oc-flex': 'OC Duration FLEX',
+                'oc-storm': 'OC Duration STORM',
+                'oc-oakridge': 'OC Oakridge',
+                'oc-designer': 'OC Duration Designer',
+                'gaf-hdz': 'GAF Timberline HDZ',
+                'metal-rpanel': 'R-Panel Metal',
+                'metal-ss': 'Metal (Standing Seam)',
+                'slate': 'Slate (New)',
+                'tpo': 'TPO / Flat'
             };
             return products[product] || 'Unknown';
         }
@@ -1653,8 +1663,12 @@
                 guttersDownspouts: document.getElementById('guttersDownspouts').value,
                 guttersStories: document.getElementById('guttersStories').value,
                 guttersSize: document.getElementById('guttersSize').value,
-                manufacturer: document.querySelector('input[name="manufacturer"]:checked').value,
                 product: document.getElementById('product').value,
+                crew: document.getElementById('crew').value,
+                materialCostOverride: document.getElementById('materialCostOverride').value,
+                dumpCost: document.getElementById('dumpCost').value,
+                rubberAccessories: document.getElementById('rubberAccessories').value,
+                duddySplit: document.getElementById('duddySplit').value,
                 marginSlider: document.getElementById('marginSlider').value,
                 jobNotes: document.getElementById('jobNotes').value,
                 photos: window.photos,
@@ -1687,8 +1701,12 @@
                 guttersDownspouts: document.getElementById('guttersDownspouts').value,
                 guttersStories: document.getElementById('guttersStories').value,
                 guttersSize: document.getElementById('guttersSize').value,
-                manufacturer: document.querySelector('input[name="manufacturer"]:checked').value,
                 product: document.getElementById('product').value,
+                crew: document.getElementById('crew').value,
+                materialCostOverride: document.getElementById('materialCostOverride').value,
+                dumpCost: document.getElementById('dumpCost').value,
+                rubberAccessories: document.getElementById('rubberAccessories').value,
+                duddySplit: document.getElementById('duddySplit').value,
                 marginSlider: document.getElementById('marginSlider').value,
                 jobNotes: document.getElementById('jobNotes').value,
                 photos: window.photos,
@@ -1726,17 +1744,16 @@
             document.getElementById('guttersDownspouts').value = quote.guttersDownspouts;
             document.getElementById('guttersStories').value = quote.guttersStories;
             document.getElementById('guttersSize').value = quote.guttersSize;
+            document.getElementById('product').value = quote.product;
+            document.getElementById('crew').value = quote.crew || 'greg';
+            document.getElementById('materialCostOverride').value = quote.materialCostOverride || '';
+            document.getElementById('dumpCost').value = quote.dumpCost || '500';
+            document.getElementById('rubberAccessories').value = quote.rubberAccessories || '0';
+            document.getElementById('duddySplit').value = quote.duddySplit || 'no';
             document.getElementById('marginSlider').value = quote.marginSlider;
             document.getElementById('marginPercentage').textContent = quote.marginSlider + '%';
             document.getElementById('jobNotes').value = quote.jobNotes;
             window.photos = quote.photos || [];
-
-            document.querySelectorAll('input[name="manufacturer"]').forEach(r => {
-                r.checked = r.value === quote.manufacturer;
-            });
-
-            updateProductOptions(quote.manufacturer);
-            document.getElementById('product').value = quote.product;
 
             const guttersDetails = document.getElementById('guttersDetails');
             guttersDetails.style.display = quote.gutters === 'yes' ? 'block' : 'none';
@@ -1755,6 +1772,10 @@
 
             document.querySelectorAll('[data-toggle="guttersSize"]').forEach(b => b.classList.remove('active'));
             document.querySelector(`[data-toggle="guttersSize"][data-value="${quote.guttersSize}"]`).classList.add('active');
+
+            document.querySelectorAll('[data-toggle="duddySplit"]').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-toggle="duddySplit"][data-value="${quote.duddySplit || 'no'}"]`).classList.add('active');
+            document.getElementById('duddySplitLabel').style.display = (quote.duddySplit === 'yes') ? 'block' : 'none';
 
             renderPhotos();
             calculateAll();
@@ -1991,16 +2012,20 @@
 
             doc.setFont(undefined, 'normal');
             doc.setFontSize(8.5);
+
+            // Calculate customer labor rate based on pitch
+            const customerLaborRate = data.pitch.customerRate;
+            const customerLaborCost = customerLaborRate * data.squares;
+
             const items = [
-                ['Roofing Material', formatCurrency(data.materialCost)],
-                ['Labor', formatCurrency(data.laborCost)],
-                ['Tear-off and Disposal', formatCurrency(data.tearoffCost)],
-                ['Underlayment and Accessories', formatCurrency(data.underlaymentCost)]
+                ['Roofing Material', formatCurrency(data.materialCostValue)],
+                ['Labor & Installation', formatCurrency(customerLaborCost)],
+                ['Dump & Cleanup', formatCurrency(data.dumpCost)],
+                ['Accessories', formatCurrency(data.rubberAccessories)]
             ];
 
             if (data.addonsCost > 0) items.push(['Add-ons', formatCurrency(data.addonsCost)]);
             if (data.guttersCost > 0) items.push(['Gutters', formatCurrency(data.guttersCost)]);
-            if (data.pitchSurcharge > 0) items.push(['Pitch Surcharge', formatCurrency(data.pitchSurcharge)]);
 
             items.forEach(item => {
                 checkPageBreak(5);
@@ -2215,16 +2240,20 @@
 
             doc.setFont(undefined, 'normal');
             doc.setFontSize(8.5);
+
+            // Calculate customer labor rate based on pitch
+            const customerLaborRate2 = data.pitch.customerRate;
+            const customerLaborCost2 = customerLaborRate2 * data.squares;
+
             const items = [
-                ['Roofing Material', formatCurrency(data.materialCost)],
-                ['Labor', formatCurrency(data.laborCost)],
-                ['Tear-off and Disposal', formatCurrency(data.tearoffCost)],
-                ['Underlayment and Accessories', formatCurrency(data.underlaymentCost)]
+                ['Roofing Material', formatCurrency(data.materialCostValue)],
+                ['Labor & Installation', formatCurrency(customerLaborCost2)],
+                ['Dump & Cleanup', formatCurrency(data.dumpCost)],
+                ['Accessories', formatCurrency(data.rubberAccessories)]
             ];
 
             if (data.addonsCost > 0) items.push(['Add-ons', formatCurrency(data.addonsCost)]);
             if (data.guttersCost > 0) items.push(['Gutters', formatCurrency(data.guttersCost)]);
-            if (data.pitchSurcharge > 0) items.push(['Pitch Surcharge', formatCurrency(data.pitchSurcharge)]);
 
             items.forEach(item => {
                 checkPageBreak(5);
@@ -2349,7 +2378,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadLogo();
             setupToggles();
-            updateProductOptions('oc');
 
             // Try to restore from session
             const saved = sessionStorage.getItem('currentQuote');
@@ -2370,21 +2398,25 @@
                 document.getElementById('guttersDownspouts').value = data.guttersDownspouts;
                 document.getElementById('guttersStories').value = data.guttersStories;
                 document.getElementById('guttersSize').value = data.guttersSize;
+                document.getElementById('product').value = data.product;
+                document.getElementById('crew').value = data.crew || 'greg';
+                document.getElementById('materialCostOverride').value = data.materialCostOverride || '';
+                document.getElementById('dumpCost').value = data.dumpCost || '500';
+                document.getElementById('rubberAccessories').value = data.rubberAccessories || '0';
+                document.getElementById('duddySplit').value = data.duddySplit || 'no';
                 document.getElementById('marginSlider').value = data.marginSlider;
                 document.getElementById('marginPercentage').textContent = data.marginSlider + '%';
                 document.getElementById('jobNotes').value = data.jobNotes;
                 window.photos = data.photos || [];
                 renderPhotos();
 
-                document.querySelectorAll('input[name="manufacturer"]').forEach(r => {
-                    r.checked = r.value === data.manufacturer;
-                });
-
-                updateProductOptions(data.manufacturer);
-                document.getElementById('product').value = data.product;
-
                 const guttersDetails = document.getElementById('guttersDetails');
                 guttersDetails.style.display = data.gutters === 'yes' ? 'block' : 'none';
+
+                // Update toggle buttons for duddy split
+                document.querySelectorAll('[data-toggle="duddySplit"]').forEach(b => b.classList.remove('active'));
+                document.querySelector(`[data-toggle="duddySplit"][data-value="${data.duddySplit || 'no'}"]`).classList.add('active');
+                document.getElementById('duddySplitLabel').style.display = (data.duddySplit === 'yes') ? 'block' : 'none';
             } else {
                 document.getElementById('estimateNumber').value = generateEstimateNumber();
             }
