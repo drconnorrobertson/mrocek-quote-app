@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Crawling remains allowed so robots can read the noindex directives.
+# This operational quote tool is intentionally absent from content sitemaps.
